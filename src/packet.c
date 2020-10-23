@@ -1,0 +1,95 @@
+#include "packet.h"
+
+struct Packet *initialize_packet()
+{
+  struct Packet *packet = malloc(sizeof(struct Packet));
+
+  // Arbitrary allocation to begin.
+  // It will be doubled when more size is required.
+  packet->content = malloc(256);
+
+  if (!packet->content)
+    return NULL;
+
+  packet->available_size = 256;
+  packet->size = 0;
+  packet->ready = 0;
+
+  return packet;
+}
+
+int finalize_packet(struct Packet *packet)
+{
+  // We need to add Checksum KLV last since it needs
+  // to checksum the whole frame. We know that the KLV
+  // frame is 4 bytes long. (1 for tag, 1 for length,
+  // 2 for value).
+  int new_size = packet->size + 1 + 1 + 2;
+
+  // This buffer will contains Key and Length of the LDS
+  // frame, since we will insert it at the beginning of the
+  // KLV, we need to populate another buffer.
+  char *LDS_KL;
+
+  // TODO : Refactorize this part of code
+
+  // LDS length field size is determined via BER short/long
+  // encoding.
+  if (new_size <= 127) {
+    // It is a short BER encoding
+    LDS_KL = malloc((16 + 1) * sizeof(char));
+    memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
+    LDS_KL[16] = (char)new_size;
+    new_size += 16 + 1;
+  }
+  else {
+    // It is a long BER encoding
+    // We set first bit of first byte
+    char first_length_byte = 128;
+
+    if (new_size <= 255) {
+      first_length_byte += 1;
+      LDS_KL = malloc((16 + 2) * sizeof(char));
+      memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
+      LDS_KL[16] = first_length_byte;
+      LDS_KL[17] = (char)new_size;
+      new_size += 16 + 2
+    }
+    else {
+      // Assuming that we will need 2 bytes at most
+      first_length_byte += 2;
+      LDS_KL = malloc((16 + 3) * sizeof(char));
+      memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
+      LD_KL[16] = first_length_byte;
+      LDS_KL[17] = (char)new_size >> 8;
+      LDS_KL[18] = (char)new_size;
+      new_size += 16 + 3;
+    }
+  }
+}
+
+struct Packet *add_klv(struct Packet *packet, enum Tags id,
+                       char value_length, char *value)
+{
+  // The tag field length follow BER-OID encoding to encode the length
+  // of the KLV. Since in MISB0601 max tag value is 93, and is under
+  // 2**7 - 1 = 127, we know that he length will be encoded in 1 byte.
+  // Value length is assumed to be coded in 1 byte.
+  int new_size = packet->size + 1 + 1 + value_length;
+
+  if (packet->available_size <= packet->size)
+  {
+    packet->content = realloc(packet->content, packet->available_size * 2);
+    if (!packet->content)
+      return NULL;
+
+    packet->available_size = packet->available_size * 2;
+  }
+
+  packet->content[packet->size++] = id;
+  packet->content[packet->size++] = value_length;
+  for (int i = 0; i < value_length; i++)
+    packet->content[packet->size++] = value[i];
+
+  return packet;
+}
