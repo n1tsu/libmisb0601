@@ -17,7 +17,7 @@ libmisb0601.so: $(OBJS)
 debug: CFLAGS+= -g
 debug: libmisb0601.so
 
-test: libmisb0601.so
+test: debug
 	$(CC) test/test.c $(CFLAGS) -Lout -lmisb0601 -o out/test
 
 clean:

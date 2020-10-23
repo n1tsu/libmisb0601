@@ -73,10 +73,10 @@ int finalize_packet(struct Packet *packet)
   }
 
   // Move packet content after LDS KL memory
-  packet->content = memmove(LDS_KL + LDS_KL_size, packet->content, packet->size);
-  if (!packet->content)
+  if (!memmove(LDS_KL + LDS_KL_size, packet->content, packet->size))
     return 1;
 
+  packet->content = LDS_KL;
   packet->size += LDS_KL_size;
 
   // Checksum KLV needs to be calculated and added
@@ -100,7 +100,7 @@ struct Packet *add_klv(struct Packet *packet, enum Tags id,
   // 2**7 - 1 = 127, we know that he length will be encoded in 1 byte.
   // Value length is assumed to be coded in 1 byte.
 
-  if (packet->available_size <= packet->size)
+  if (packet->available_size <= packet->size + 2 + value_length)
   {
     packet->content = realloc(packet->content, packet->available_size * 2);
     if (!packet->content)
