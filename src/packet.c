@@ -1,7 +1,7 @@
 #include "packet.h"
 
 // Checksum function from MISB0601 documentation
-unisgned short bcc_16(unsigned char *buff, unsigned short len);
+unsigned short bcc_16(uint8_t *buff, unsigned short len);
 
 struct Packet *initialize_packet()
 {
@@ -33,7 +33,7 @@ int finalize_packet(struct Packet *packet)
   // This buffer will contains Key and Length of the LDS
   // frame, since we will insert it at the beginning of the
   // KLV, we need to populate another buffer.
-  char *LDS_KL = NULL;
+  uint8_t *LDS_KL = NULL;
   int LDS_KL_size = 0;
 
   // TODO : Refactorize this part of code
@@ -42,32 +42,32 @@ int finalize_packet(struct Packet *packet)
   // encoding.
   if (new_size <= 127) {
     // It is a short BER encoding
-    LDS_KL = malloc((new_size + 16 + 1) * sizeof(char));
+    LDS_KL = malloc((new_size + 16 + 1) * sizeof(uint8_t));
     memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
-    LDS_KL[16] = (char)new_size;
+    LDS_KL[16] = (uint8_t)new_size;
     LDS_KL_size = 16 + 1;
   }
   else {
     // It is a long BER encoding
     // We set first bit of first byte
-    char first_length_byte = 128;
+    uint8_t first_length_byte = 1 << 7;
 
     if (new_size <= 255) {
       first_length_byte += 1;
-      LDS_KL = malloc((new_size + 16 + 2) * sizeof(char));
+      LDS_KL = malloc((new_size + 16 + 2) * sizeof(uint8_t));
       memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
       LDS_KL[16] = first_length_byte;
-      LDS_KL[17] = (char)new_size;
-      LDS_KL_size = 16 + 2
+      LDS_KL[17] = (uint8_t)new_size;
+      LDS_KL_size = 16 + 2;
     }
     else {
       // Assuming that we will need 2 bytes at most
       first_length_byte += 2;
-      LDS_KL = malloc((new_size + 16 + 3) * sizeof(char));
+      LDS_KL = malloc((new_size + 16 + 3) * sizeof(uint8_t));
       memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
-      LD_KL[16] = first_length_byte;
-      LDS_KL[17] = (char)new_size >> 8;
-      LDS_KL[18] = (char)new_size;
+      LDS_KL[16] = first_length_byte;
+      LDS_KL[17] = (uint8_t)new_size >> 8;
+      LDS_KL[18] = (uint8_t)new_size;
       LDS_KL_size = 16 + 3;
     }
   }
@@ -84,20 +84,19 @@ int finalize_packet(struct Packet *packet)
   packet->content[packet->size - 3] = 2;
 
   short checksum = bcc_16(packet->content, packet->size - 3);
-  packet->content[packet->size - 2] = (char)checksum >> 8;
-  packet->content[packet->size - 1] = (char)checksum;
+  packet->content[packet->size - 2] = (uint8_t)checksum >> 8;
+  packet->content[packet->size - 1] = (uint8_t)checksum;
 
   return 0;
 }
 
 struct Packet *add_klv(struct Packet *packet, enum Tags id,
-                       char value_length, char *value)
+                       uint8_t value_length, uint8_t *value)
 {
   // The tag field length follow BER-OID encoding to encode the length
   // of the KLV. Since in MISB0601 max tag value is 93, and is under
   // 2**7 - 1 = 127, we know that he length will be encoded in 1 byte.
   // Value length is assumed to be coded in 1 byte.
-  int new_size = packet->size + 1 + 1 + value_length;
 
   if (packet->available_size <= packet->size)
   {
@@ -118,7 +117,7 @@ struct Packet *add_klv(struct Packet *packet, enum Tags id,
 
 // `buff` is a pointer to the first byte in the 16-byte UAS LDS key.
 // `len` is the length from 16-byte UDS key up to 1-byte checksum length.
-unsigned short bcc_16(unsigned char *buff, unsigned short len)
+unsigned short bcc_16(uint8_t *buff, unsigned short len)
 {
   // Initialize Checksum and counter variables.
   unsigned short bcc = 0, i;

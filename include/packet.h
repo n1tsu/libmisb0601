@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "keys.h"
@@ -24,10 +25,10 @@
  *  If this flag is set, it is not possible to add KLV to the packet.
  */
 struct Packet {
-  char *content;
+  uint8_t *content;
   size_t available_size;
   size_t size;
-  char ready;
+  uint8_t ready;
 };
 
 /**
@@ -63,4 +64,5 @@ int finalize_packet(struct Packet *packet);
  *
  *  `value` is the bytes of the value.
  */
-struct Packet *add_klv(struct Packet *packet, enum Tags id, int value_length, char *value);
+struct Packet *add_klv(struct Packet *packet, enum Tags id,
+                       uint8_t value_length, uint8_t *value);

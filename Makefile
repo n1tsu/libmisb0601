@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Werror -Wextra -pedantic -I. -Iinclude
 LIBS=
 SRC= \
-	src/.cpp					\
+	src/packet.c					\
 
 OBJS=$(SRC:.cpp=.o)
 
