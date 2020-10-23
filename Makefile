@@ -4,15 +4,18 @@ LIBS=
 SRC= \
 	src/packet.c					\
 
-OBJS=$(SRC:.cpp=.o)
+OBJS=$(SRC:.c=.o)
 
 all: misb0601lib.so
 
 %.o: %.c
-	$(CXX) -c -o $@ $< $(CFLAGS) $(LIBS)
+	$(CC) -c -fPIC -o $@ $< $(CFLAGS) $(LIBS)
 
 misb0601lib.so: $(OBJS)
 	$(CC) $^ --share -o out/$@ $(CFLAGS) $(LIBS)
+
+debug: CFLAGS+= -g
+debug: misb0601lib.so
 
 clean:
 	$(RM) out/* $(OBJS)
