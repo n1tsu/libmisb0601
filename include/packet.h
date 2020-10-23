@@ -64,6 +64,11 @@ int finalize_packet(struct Packet *packet);
  *  Refer to the documentation to know length.
  *
  *  `value` is the bytes of the value.
+ *
+ *  `invert` is a flag to determine if we want to store
+ *  the value inverting the bytes.
+ *  TODO : find a way to get rid of this flag
  */
 struct Packet *add_klv(struct Packet *packet, enum Tags id,
-                       uint8_t value_length, uint8_t *value);
+                       uint8_t value_length, uint8_t *value,
+                       uint8_t invert);

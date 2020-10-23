@@ -1,4 +1,5 @@
 #include "packet.h"
+#include <stdio.h>
 
 // Checksum function from MISB0601 documentation
 unsigned short bcc_16(uint8_t *buff, unsigned short len);
@@ -83,8 +84,11 @@ int finalize_packet(struct Packet *packet)
   packet->content[packet->size - 4] = CHECKSUM;
   packet->content[packet->size - 3] = 2;
 
-  short checksum = bcc_16(packet->content, packet->size - 3);
-  packet->content[packet->size - 2] = (uint8_t)checksum >> 8;
+  unsigned short checksum = bcc_16(packet->content, packet->size - 2);
+  printf("%x\n", checksum);
+  printf("%x\n", (uint8_t)(checksum >> 8));
+  printf("%x\n", (uint8_t)checksum);
+  packet->content[packet->size - 2] = (uint8_t)(checksum >> 8);
   packet->content[packet->size - 1] = (uint8_t)checksum;
 
   packet->ready = 1;
@@ -93,7 +97,8 @@ int finalize_packet(struct Packet *packet)
 }
 
 struct Packet *add_klv(struct Packet *packet, enum Tags id,
-                       uint8_t value_length, uint8_t *value)
+                       uint8_t value_length, uint8_t *value,
+                       uint8_t invert)
 {
   // The tag field length follow BER-OID encoding to encode the length
   // of the KLV. Since in MISB0601 max tag value is 93, and is under
@@ -112,7 +117,10 @@ struct Packet *add_klv(struct Packet *packet, enum Tags id,
   packet->content[packet->size++] = id;
   packet->content[packet->size++] = value_length;
   for (int i = 0; i < value_length; i++)
-    packet->content[packet->size++] = value[i];
+    if (invert)
+      packet->content[packet->size++] = value[value_length - i - 1];
+    else
+      packet->content[packet->size++] = value[i];
 
   return packet;
 }

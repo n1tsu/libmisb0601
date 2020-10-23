@@ -7,16 +7,16 @@ int main()
 {
     struct Packet *packet = initialize_packet();
     unsigned long unix_time = (uint64_t)time(NULL);
-    printf("UNIX TIMESTAMP is : %lun\n", unix_time);
+    printf("UNIX TIMESTAMP is : %lu\n", unix_time);
 
     printf("Create KLV from it\n\n");
-    packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t *)&unix_time);
+    packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t *)&unix_time, 1);
 
     char mission[9] = "MISSION01";
     printf("MISSION ID is : %s\n", mission);
 
     printf("Create KLV from it\n\n");
-    packet = add_klv(packet, MISSION_ID, 9, (uint8_t *)mission);
+    packet = add_klv(packet, MISSION_ID, 9, (uint8_t *)mission, 0);
 
     finalize_packet(packet);
     int space = 0;
@@ -40,6 +40,7 @@ int main()
         }
     }
     printf("\n");
+    printf("Size is : %ld\n", packet->size);
 
     return 0;
 }
