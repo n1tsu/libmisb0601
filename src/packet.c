@@ -87,6 +87,8 @@ int finalize_packet(struct Packet *packet)
   packet->content[packet->size - 2] = (uint8_t)checksum >> 8;
   packet->content[packet->size - 1] = (uint8_t)checksum;
 
+  packet->ready = 1;
+
   return 0;
 }
 

@@ -61,6 +61,7 @@ int finalize_packet(struct Packet *packet);
  *  `packet` is the packet into the KLV while be added.
  *
  *  `value_length` represents the size of the value.
+ *  Refer to the documentation to know length.
  *
  *  `value` is the bytes of the value.
  */
