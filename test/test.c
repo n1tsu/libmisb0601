@@ -1,12 +1,19 @@
-#include <time.h>
+#include <sys/time.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "packet.h"
+
+uint64_t get_timestamp() {
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    return tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
+}
 
 int main()
 {
     struct Packet *packet = initialize_packet();
-    unsigned long unix_time = (uint64_t)time(NULL);
+    uint64_t unix_time = get_timestamp();
     printf("UNIX TIMESTAMP is : %lu\n", unix_time);
 
     printf("Create KLV from it\n\n");
