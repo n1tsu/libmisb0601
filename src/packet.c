@@ -19,6 +19,15 @@ struct Packet *initialize_packet()
   packet->size = 0;
   packet->ready = 0;
 
+  // Add mandatory KLV for UAS_LDS version which is ST0601.6
+
+  // Add key tag
+  packet->content[packet->size++] = UAS_LDS_VERSION_NUMBER;
+  // Add size
+  packet->content[packet->size++] = 1;
+  // Add revision number
+  packet->content[packet->size++] = 0x6;
+
   return packet;
 }
 
@@ -85,9 +94,6 @@ int finalize_packet(struct Packet *packet)
   packet->content[packet->size - 3] = 2;
 
   unsigned short checksum = bcc_16(packet->content, packet->size - 2);
-  printf("%x\n", checksum);
-  printf("%x\n", (uint8_t)(checksum >> 8));
-  printf("%x\n", (uint8_t)checksum);
   packet->content[packet->size - 2] = (uint8_t)(checksum >> 8);
   packet->content[packet->size - 1] = (uint8_t)checksum;
 
