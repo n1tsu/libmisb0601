@@ -31,6 +31,12 @@ struct Packet *initialize_packet()
   return packet;
 }
 
+void free_packet(struct Packet *packet)
+{
+  free(packet->content);
+  free(packet);
+}
+
 int finalize_packet(struct Packet *packet)
 {
   // We need to add Checksum KLV last since it needs
@@ -82,9 +88,11 @@ int finalize_packet(struct Packet *packet)
     }
   }
 
-  // Move packet content after LDS KL memory
-  if (!memmove(LDS_KL + LDS_KL_size, packet->content, packet->size))
+  // Copy packet content after LDS KL memory
+  if (!memcpy(LDS_KL + LDS_KL_size, packet->content, packet->size))
     return 1;
+
+  free(packet->content);
 
   packet->content = LDS_KL;
   packet->size += LDS_KL_size;

@@ -38,6 +38,11 @@ struct Packet {
 struct Packet *initialize_packet();
 
 /**
+ *  Release the memory allocated during initialization
+ */
+void free_packet(struct Packet *packet);
+
+/**
  *  Finalize the packet.
  *
  *  Add inside the `packet`, in this order :
