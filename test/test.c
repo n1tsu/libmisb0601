@@ -26,6 +26,20 @@ int main()
     packet = add_klv(packet, MISSION_ID, 9, (uint8_t *)mission, 0);
 
     finalize_packet(packet);
+
+    // Save into a file
+    FILE * file;
+    file = fopen("klv_test.bin", "w+");
+
+    if(!file)
+    {
+        fprintf(stderr, "Unable to create file.\n");
+        return 1;
+    }
+    fwrite(packet->content, 1, packet->size, file);
+    fclose(file);
+
+    /*
     int space = 0;
     int line = 0;
 
@@ -48,6 +62,7 @@ int main()
     }
     printf("\n");
     printf("Size is : %ld\n", packet->size);
+    */
 
     return 0;
 }
