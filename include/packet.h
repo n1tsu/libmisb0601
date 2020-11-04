@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKET_H
+#define PACKET_H
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -77,3 +78,5 @@ int finalize_packet(struct Packet *packet);
 struct Packet *add_klv(struct Packet *packet, enum Tags id,
                        uint8_t value_length, uint8_t *value,
                        uint8_t invert);
+
+#endif /* !PACKET_H */

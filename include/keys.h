@@ -1,8 +1,7 @@
-#pragma once
+#ifndef KEYS_H
+#define KEYS_H
 
 #include <stdint.h>
-
-const uint8_t LDS_UNIVERSAL_KEY[16] = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x0b, 0x01, 0x01, 0x0e, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00};
 
 // All KLVs tags from the MISB0601
 enum Tags {
@@ -100,3 +99,5 @@ enum Tags {
   PLATFORM_ANGLE_OF_ATTACK_F = 92,
   PLATFORM_SIDESLIP_ANGLE_F = 93,
 };
+
+#endif /* !KEYS_H */

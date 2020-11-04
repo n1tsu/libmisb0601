@@ -4,6 +4,7 @@ LIBNAME=libmisb0601.so
 TESTNAME=misb0601-test
 SRC= \
 	src/packet.c					\
+	src/unpack.c					\
 
 OBJS=$(SRC:.c=.o)
 

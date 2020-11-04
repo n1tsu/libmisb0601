@@ -1,6 +1,8 @@
 #include "packet.h"
 #include <stdio.h>
 
+const uint8_t LDS_UNIVERSAL_KEY[16] = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x0b, 0x01, 0x01, 0x0e, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00};
+
 // Checksum function from MISB0601 documentation
 unsigned short bcc_16(uint8_t *buff, unsigned short len);
 
@@ -116,7 +118,7 @@ struct Packet *add_klv(struct Packet *packet, enum Tags id,
 {
   // The tag field length follow BER-OID encoding to encode the length
   // of the KLV. Since in MISB0601 max tag value is 93, and is under
-  // 2**7 - 1 = 127, we know that he length will be encoded in 1 byte.
+  // 2**7 - 1 = 127, we know that the length will be encoded in 1 byte.
   // Value length is assumed to be coded in 1 byte.
 
   if (packet->available_size <= packet->size + 2 + value_length)

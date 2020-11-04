@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "packet.h"
+#include "unpack.h"
 
 uint64_t get_timestamp() {
     struct timeval tv;
@@ -12,6 +13,7 @@ uint64_t get_timestamp() {
 
 int main()
 {
+    // Create a packet
     struct Packet *packet = initialize_packet();
     uint64_t unix_time = get_timestamp();
     printf("UNIX TIMESTAMP is : %lu\n", unix_time);
@@ -30,7 +32,6 @@ int main()
     // Save into a file
     FILE * file;
     file = fopen("klv_test.bin", "w+");
-
     if(!file)
     {
         fprintf(stderr, "Unable to create file.\n");
@@ -39,30 +40,15 @@ int main()
     fwrite(packet->content, 1, packet->size, file);
     fclose(file);
 
-    /*
-    int space = 0;
-    int line = 0;
+    // Unpack the packet
+    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
 
-    printf("\n");
-    for (size_t i = 0 ; i < packet->size; i++)
-    {
-        space += 1;
-        line += 1;
-        printf("%02hhx", packet->content[i]);
-        if (space == 2)
-        {
-            printf(" ");
-            space = 0;
-        }
-        if (line == 8)
-        {
-            printf("\n");
-            line = 0;
-        }
-    }
-    printf("\n");
-    printf("Size is : %ld\n", packet->size);
-    */
+    for (int i = 0; i < 94; i++)
+        klvmap->KLVs[i] = NULL;
+
+    int res = unpack_misb(packet->content, packet->size, klvmap);
+    if (res)
+      fprintf(stderr, "Error unpacking the packet : %d\n", res);
 
     return 0;
 }
