@@ -27,8 +27,8 @@ install: $(LIBNAME) $(TESTNAME)
 	install -m 0644 include/packet.h $(DESTDIR)/usr/include/misb0601/packet.h
 	install -m 0644 include/keys.h $(DESTDIR)/usr/include/misb0601/keys.h
 
-$(TESTNAME): debug
-	$(CC) test/test.c $(CFLAGS) -Lout -lmisb0601 -o out/$@
+$(TESTNAME):
+	$(CC) test/test.c $(CFLAGS) -g -Lout -lmisb0601 -o out/$@
 
 clean:
 	$(RM) out/* $(OBJS) test/test.o

@@ -97,6 +97,12 @@ int unpack_misb(unsigned char *data, size_t size, struct KLVMap *klvmap)
     {
       if (klv_tag != CHECKSUM)
         expected_checksum += checksumByte(i);
+      else
+      {
+        packet_checksum_klv = packet_checksum_klv << 8;
+        packet_checksum_klv += data[i];
+      }
+      i++;
     }
 
     if (klv_tag == UNIX_TIME_STAMP) contain_timestamp_klv = 1;
