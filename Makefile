@@ -15,7 +15,7 @@ all: $(LIBNAME) $(TESTNAME)
 
 $(LIBNAME): $(OBJS)
 	mkdir -p out
-	$(CC) $^ --share -o out/$@ $(CFLAGS)
+	$(CC) $^ -shared -o out/$@ $(CFLAGS)
 
 debug: CFLAGS+= -g
 debug: $(LIBNAME)
