@@ -41,6 +41,8 @@ int main()
     fclose(file);
 
     // Unpack the packet
+
+    printf("Unpacking :\n");
     struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
 
     for (int i = 0; i < 94; i++)
@@ -49,6 +51,15 @@ int main()
     int res = unpack_misb(packet->content, packet->size, klvmap);
     if (res)
       fprintf(stderr, "Error unpacking the packet : %d\n", res);
+
+    for (int i = 0; i < 94; i++)
+    {
+        if (klvmap->KLVs[i])
+            printf("Tag %d - Size %ld\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
+    }
+
+    free_packet(packet);
+    free(klvmap);
 
     return 0;
 }
