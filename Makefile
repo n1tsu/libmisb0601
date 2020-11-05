@@ -1,5 +1,5 @@
 CC?=gcc
-CFLAGS+=-Wall -Werror -Wextra -pedantic -I. -Iinclude -fPIC
+CFLAGS+=-Wall -Werror -Wextra -pedantic -I. -Iinclude -fPIC -L.
 LIBNAME=libmisb0601.so
 TESTNAME=misb0601-test
 SRC= \

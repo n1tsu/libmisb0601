@@ -48,46 +48,42 @@ int finalize_packet(struct Packet *packet)
   packet->size += 1 + 1 + 2;
   int new_size = packet->size;
 
-  // This buffer will contains Key and Length of the LDS
-  // frame, since we will insert it at the beginning of the
-  // KLV, we need to populate another buffer.
-  uint8_t *LDS_KL = NULL;
   int LDS_KL_size = 0;
 
-  // TODO : Refactorize this part of code
+  // LDS length field size is determined via BER short/long encoding.
+  // LDS_K_size is the size of the key, LDS_L_size is the size of the
+  // length field.
+  int LDS_K_size = 16;
+  int LDS_L_size = 0;
 
-  // LDS length field size is determined via BER short/long
-  // encoding.
-  if (new_size <= 127) {
-    // It is a short BER encoding
-    LDS_KL = malloc((new_size + 16 + 1) * sizeof(uint8_t));
-    memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
-    LDS_KL[16] = (uint8_t)new_size;
-    LDS_KL_size = 16 + 1;
+  // Short BER
+  if (new_size <= 127)
+    LDS_L_size = 1;
+  // Long BER
+  else if (new_size <= 255)
+    LDS_L_size = 2;
+  else
+    LDS_L_size = 3;
+
+  LDS_KL_size = LDS_K_size + LDS_L_size;
+
+  // Create memory of the length of the whole packet, packet->content will be
+  // appended to this buffer.
+  uint8_t *LDS_KL = malloc((new_size + LDS_KL_size) * sizeof(uint8_t));
+  memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
+
+  if (LDS_L_size == 1)
+    LDS_KL[LDS_K_size] = (uint8_t)new_size;
+  else if (LDS_L_size == 2)
+  {
+    LDS_KL[LDS_K_size] = (1 << 7) + 1;
+    LDS_KL[LDS_K_size + 1] = (uint8_t)new_size;
   }
-  else {
-    // It is a long BER encoding
-    // We set first bit of first byte
-    uint8_t first_length_byte = 1 << 7;
-
-    if (new_size <= 255) {
-      first_length_byte += 1;
-      LDS_KL = malloc((new_size + 16 + 2) * sizeof(uint8_t));
-      memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
-      LDS_KL[16] = first_length_byte;
-      LDS_KL[17] = (uint8_t)new_size;
-      LDS_KL_size = 16 + 2;
-    }
-    else {
-      // Assuming that we will need 2 bytes at most
-      first_length_byte += 2;
-      LDS_KL = malloc((new_size + 16 + 3) * sizeof(uint8_t));
-      memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
-      LDS_KL[16] = first_length_byte;
-      LDS_KL[17] = (uint8_t)new_size >> 8;
-      LDS_KL[18] = (uint8_t)new_size;
-      LDS_KL_size = 16 + 3;
-    }
+  else
+  {
+    LDS_KL[LDS_K_size] = (1 << 7) + 2;
+    LDS_KL[LDS_K_size + 1] = (uint8_t)new_size >> 8;
+    LDS_KL[LDS_K_size + 2] = (uint8_t)new_size;
   }
 
   // Copy packet content after LDS KL memory
