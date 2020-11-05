@@ -1,6 +1,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "packet.h"
 #include "unpack.h"
@@ -16,7 +17,7 @@ int main()
     // Create a packet
     struct Packet *packet = initialize_packet();
     uint64_t unix_time = get_timestamp();
-    printf("UNIX TIMESTAMP is : %lu\n", unix_time);
+    printf("UNIX TIMESTAMP is : %" PRIu64 "\n", unix_time);
 
     printf("Create KLV from it\n\n");
     packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t *)&unix_time, 1);
@@ -55,7 +56,7 @@ int main()
     for (int i = 0; i < 94; i++)
     {
         if (klvmap->KLVs[i])
-            printf("Tag %d - Size %ld\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
+            printf("Tag %d - Size %zu\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
     }
 
     free_packet(packet);
