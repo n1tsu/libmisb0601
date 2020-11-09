@@ -1,10 +1,11 @@
 CC?=gcc
-CFLAGS+=-Wall -Werror -Wextra -pedantic -I. -Iinclude -fPIC -L.
+CFLAGS+=-Wall -Werror -Wextra -pedantic -I. -Iinclude -fPIC -L. -lm
 LIBNAME=libmisb0601.so
 TESTNAME=misb0601-test
 SRC= \
 	src/packet.c					\
 	src/unpack.c					\
+	src/utils.c						\
 
 OBJS=$(SRC:.c=.o)
 

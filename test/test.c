@@ -5,6 +5,7 @@
 
 #include "packet.h"
 #include "unpack.h"
+#include "utils.h"
 
 uint64_t get_timestamp() {
     struct timeval tv;
@@ -61,6 +62,14 @@ int main()
 
     free_packet(packet);
     free(klvmap);
+
+    // Test utils conversions
+    printf("\nTest conversion\n");
+    printf("Encoding -61.88693\n");
+    printf("%u\n", signed_dec_to_int16(-61.88693, 360));
+
+    printf("Decoding 0xD3FE\n");
+    printf("%f\n", int16_to_signed_dec(0xD3FE, 360));
 
     return 0;
 }
