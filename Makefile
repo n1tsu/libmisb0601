@@ -9,7 +9,7 @@ SRC= \
 
 OBJS=$(SRC:.c=.o)
 
-all: $(LIBNAME) $(TESTNAME)
+all: $(LIBNAME)
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -20,12 +20,10 @@ $(LIBNAME): $(OBJS)
 debug: CFLAGS+= -g
 debug: $(LIBNAME)
 
-install: $(LIBNAME) $(TESTNAME)
+install: $(LIBNAME)
 	install -d 0755 ${DESTDIR}/usr/lib $(DESTDIR)/usr/bin $(DESTDIR)/usr/include/misb0601
 	install -m 0644 $(LIBNAME) $(DESTDIR)/usr/lib/$(LIBNAME)
-	install -m 0644 $(TESTNAME) $(DESTDIR)/usr/bin/$(TESTNAME)
-	install -m 0644 include/packet.h $(DESTDIR)/usr/include/misb0601/packet.h
-	install -m 0644 include/keys.h $(DESTDIR)/usr/include/misb0601/keys.h
+	install -m 0644 include/*.h $(DESTDIR)/usr/include/misb0601/
 
 $(TESTNAME):
 	$(CC) test/test.c $(CFLAGS) -g -lmisb0601 -o $@
