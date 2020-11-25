@@ -29,6 +29,6 @@ $(TESTNAME):
 	$(CC) test/test.c $(CFLAGS) -g -lmisb0601 -o $@
 
 clean:
-	$(RM) $(TESTNAME) $(LIBNAME) $(OBJS) test/test.o
+	$(RM) $(TESTNAME) $(LIBNAME) $(OBJS) test/test.o klv_test.bin
 
 .PHONY: clean all
