@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 #include "packet.h"
 #include <stdio.h>
 
@@ -5,6 +7,12 @@ const uint8_t LDS_UNIVERSAL_KEY[16] = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x0b, 0x01,
 
 // Checksum function from MISB0601 documentation
 unsigned short bcc_16(uint8_t *buff, unsigned short len);
+
+uint64_t get_timestamp() {
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    return tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
+}
 
 struct Packet *initialize_packet()
 {
@@ -21,8 +29,11 @@ struct Packet *initialize_packet()
   packet->size = 0;
   packet->ready = 0;
 
-  // Add mandatory KLV for UAS_LDS version which is ST0601.6
+  // Add mandatory Timestamp KLV which needs to be the first klv
+  uint64_t unix_time = get_timestamp();
+  packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t*)&unix_time, 1);
 
+  // Add mandatory KLV for UAS_LDS version which is ST0601.6
   // Add key tag
   packet->content[packet->size++] = UAS_LDS_VERSION_NUMBER;
   // Add size

@@ -7,21 +7,10 @@
 #include "unpack.h"
 #include "utils.h"
 
-uint64_t get_timestamp() {
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
-}
-
 int main()
 {
     // Create a packet
     struct Packet *packet = initialize_packet();
-    uint64_t unix_time = get_timestamp();
-    printf("UNIX TIMESTAMP is : %" PRIu64 "\n", unix_time);
-
-    printf("Create KLV from it\n\n");
-    packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t *)&unix_time, 1);
 
     char mission[9] = "MISSION01";
     printf("MISSION ID is : %s\n", mission);
