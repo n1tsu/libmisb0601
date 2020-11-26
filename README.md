@@ -10,16 +10,16 @@ Usage :
 #include "packet.h"
 
 // Initialize an UDS packet
+// Unix Timestamp and UAS_LDS version KLVs are added automatically
 struct Packet *packet = initialize_packet();
 
-// Get UNIX timestamp
-unsigned long unix_time = (uint64_t)time(NULL);
-
-// Add Timestamp KLV to packet
+// Add mission name KLV to packet
+char mission[9] = "MISSION01";
 // See packet.h to understand parameters
-packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t *)&unix_time, 1);
+packet = add_klv(packet, MISSION_ID, 9, (uint8_t *)mission, 0);
 
 // Finalize packet to be ready to being sent
+// Checksum KLV is calculated and added
 finalize_packet(packet);
 
 // We can then access data with `packet->content` and `packet->size`
