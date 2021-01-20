@@ -48,7 +48,7 @@ float int16_to_signed_dec(unsigned short value, int range)
 
 // INT32
 
-int signed_dec_to_int32(float value, int range)
+int signed_dec_to_int32(double value, int range)
 {
   char negative = 0;
   int result = 0;
@@ -69,10 +69,10 @@ int signed_dec_to_int32(float value, int range)
   return result;
 }
 
-float int32_to_signed_dec(int value, int range)
+double int32_to_signed_dec(int value, int range)
 {
   char negative = 0;
-  float result = 0;
+  double result = 0;
 
   // unpack two's complement value
   if ((value >> 31) & 1)
@@ -82,7 +82,7 @@ float int32_to_signed_dec(int value, int range)
   }
 
   // range of an uint16 is 4294967294
-  result = ((float)range / 4294967294.0) * (float)value;
+  result = ((double)range / 4294967294.0) * (double)value;
   if (negative)
     result *= -1;
 
