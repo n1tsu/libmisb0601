@@ -5,7 +5,7 @@
 
 // INT16
 
-unsigned short signed_dec_to_int16(float value, int range)
+unsigned short signed_dec_to_int16(float value, float range)
 {
   char negative = 0;
   unsigned short result = 0;
@@ -26,7 +26,7 @@ unsigned short signed_dec_to_int16(float value, int range)
   return result;
 }
 
-float int16_to_signed_dec(unsigned short value, int range)
+float int16_to_signed_dec(unsigned short value, float range)
 {
   char negative = 0;
   float result = 0;
@@ -48,7 +48,7 @@ float int16_to_signed_dec(unsigned short value, int range)
 
 // INT32
 
-int signed_dec_to_int32(double value, int range)
+int signed_dec_to_int32(double value, float range)
 {
   char negative = 0;
   int result = 0;
@@ -69,7 +69,7 @@ int signed_dec_to_int32(double value, int range)
   return result;
 }
 
-double int32_to_signed_dec(int value, int range)
+double int32_to_signed_dec(int value, float range)
 {
   char negative = 0;
   double result = 0;

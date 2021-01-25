@@ -23,7 +23,7 @@
  *  @param range is the range of the value.
  *  @return the encoded value.
  */
-unsigned short signed_dec_to_int16(float value, int range);
+unsigned short signed_dec_to_int16(float value, float range);
 
 /**
  *  Convert an int16 value to a signed decimal.
@@ -33,7 +33,7 @@ unsigned short signed_dec_to_int16(float value, int range);
  *  @param range is the range of the value.
  *  @return the decoded value.
  */
-float int16_to_signed_dec(unsigned short value, int range);
+float int16_to_signed_dec(unsigned short value, float range);
 
 /**
  *  Convert signed decimal value to int32.
@@ -43,7 +43,7 @@ float int16_to_signed_dec(unsigned short value, int range);
  *  @param range is the range of the value.
  *  @return the encoded value.
  */
-int signed_dec_to_int32(double value, int range);
+int signed_dec_to_int32(double value, float range);
 
 /**
  *  Convert an int32 value to a signed decimal.
@@ -53,7 +53,7 @@ int signed_dec_to_int32(double value, int range);
  *  @param range is the range of the value.
  *  @return the decoded value.
  */
-double int32_to_signed_dec(int value, int range);
+double int32_to_signed_dec(int value, float range);
 
 
 #endif /* !UTILS_H */
