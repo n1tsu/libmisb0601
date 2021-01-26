@@ -46,6 +46,21 @@ float int16_to_signed_dec(unsigned short value, float range)
   return result;
 }
 
+unsigned short unsigned_dec_to_int16(float value, float range, float offset)
+{
+  unsigned short result = 0;
+  result = (unsigned short) round(((value + offset)* 65534) / range);
+  return result;
+}
+
+
+float int16_to_unsigned_dec(unsigned short value, float range, float offset)
+{
+  float result = 0;
+  result = ((float)range / 65534.0) * (float) value;
+  return result - offset;
+}
+
 // INT32
 
 int signed_dec_to_int32(double value, float range)

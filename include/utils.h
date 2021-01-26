@@ -26,7 +26,7 @@
 unsigned short signed_dec_to_int16(float value, float range);
 
 /**
- *  Convert an int16 value to a signed decimal.
+ *  convert an int16 value to a signed decimal.
  *  int16 value should be encoded using two's complement.
  *
  *  @param value is the value to decode.
@@ -34,6 +34,25 @@ unsigned short signed_dec_to_int16(float value, float range);
  *  @return the decoded value.
  */
 float int16_to_signed_dec(unsigned short value, float range);
+/**
+ *  Convert an unsigned decimal value to int16.
+ *
+ *  @param value is the value to encode.
+ *  @param range is the range of the value.
+ *  @param offset is the offset of the value.
+ *  @return the encoded value.
+ */
+unsigned short unsigned_dec_to_int16(float value, float range, float offset);
+
+/**
+ *  convert an int16 value to an unsigned decimal.
+ *
+ *  @param value is the value to decode.
+ *  @param range is the range of the value.
+ *  @param offset of the value.
+ *  @return the decoded value.
+ */
+float int16_to_unsigned_dec(unsigned short value, float range, float offset);
 
 /**
  *  Convert signed decimal value to int32.

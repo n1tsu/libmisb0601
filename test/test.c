@@ -55,10 +55,22 @@ int main()
     // Test utils conversions
     printf("\nTest conversion\n");
     printf("Encoding -61.88693\n");
-    printf("%u\n", signed_dec_to_int16(-61.88693, 360));
+    printf("0x%x\n", signed_dec_to_int16(-61.88693, 360));
 
     printf("Decoding 0xD3FE\n");
-    printf("%f\n", int16_to_signed_dec(0xD3FE, 360));
+    printf("%f\n\n", int16_to_signed_dec(0xD3FE, 360));
+
+    printf("Encoding 14190.72\n");
+    printf("0x%x\n", unsigned_dec_to_int16(14190.72, 19900, 900));
+
+    printf("Decoding 0xC221\n");
+    printf("%f\n\n", int16_to_unsigned_dec(0xC221, 19900, 900));
+
+    printf("Encoding 60.1768229669783\n");
+    printf("0x%x\n", signed_dec_to_int32(60.1768229669783, 180));
+
+    printf("Decoding 0x5595B66D\n");
+    printf("%f\n", int32_to_signed_dec(0x5595B66D, 180));
 
     return 0;
 }
