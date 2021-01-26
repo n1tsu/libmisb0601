@@ -74,5 +74,25 @@ int signed_dec_to_int32(double value, float range);
  */
 double int32_to_signed_dec(int value, float range);
 
+/**
+ *  Convert unsigned decimal value to int32.
+ *
+ *  @param value is the value to encode.
+ *  @param range is the range of the value.
+ *  @param range is the range of the value.
+ *  @param offset is the offset of the value.
+ *  @return the encoded value.
+ */
+int unsigned_dec_to_int32(double value, float range, double offset);
+
+/**
+ *  Convert an int32 value to an unsigned decimal.
+ *
+ *  @param value is the value to decode.
+ *  @param range is the range of the value.
+ *  @param offset is the offset of the value.
+ *  @return the decoded value.
+ */
+double int32_to_unsigned_dec(int value, float range, double offset);
 
 #endif /* !UTILS_H */

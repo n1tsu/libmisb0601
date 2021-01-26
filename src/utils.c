@@ -103,3 +103,17 @@ double int32_to_signed_dec(int value, float range)
 
   return result;
 }
+
+int unsigned_dec_to_int32(double value, float range, double offset)
+{
+  int result = 0;
+  result = round(((value + offset)* 4294967294.0) / range);
+  return result;
+}
+
+double int32_to_unsigned_dec(int value, float range, double offset)
+{
+  double result = 0;
+  result = ((double)range / 4294967294.0) * (double)value;
+  return result - offset;
+}
