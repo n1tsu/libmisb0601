@@ -25,7 +25,7 @@ install: $(LIBNAME)
 	install -m 0644 $(LIBNAME) $(DESTDIR)/usr/lib/$(LIBNAME)
 	install -m 0644 include/*.h $(DESTDIR)/usr/include/misb0601/
 
-$(TESTNAME):
+$(TESTNAME): test/test.c
 	$(CC) test/test.c $(CFLAGS) -g -lmisb0601 -o $@
 
 clean:
