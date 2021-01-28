@@ -1,18 +1,10 @@
-#include <sys/time.h>
-
 #include "packet.h"
+#include "utils.h"
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
-const uint8_t LDS_UNIVERSAL_KEY[16] = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x0b, 0x01, 0x01, 0x0e, 0x01, 0x03, 0x01, 0x01, 0x00, 0x00, 0x00};
-
-// Checksum function from MISB0601 documentation
-unsigned short bcc_16(uint8_t *buff, unsigned short len);
-
-uint64_t get_timestamp() {
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
-}
 
 struct Packet *initialize_packet()
 {
@@ -31,7 +23,8 @@ struct Packet *initialize_packet()
 
   // Add mandatory Timestamp KLV which needs to be the first klv
   uint64_t unix_time = get_timestamp();
-  packet = add_klv(packet, UNIX_TIME_STAMP, 8, (uint8_t*)&unix_time, 1);
+  struct GenericValue unix_time_stamp_value = {UINT64, .uint64_value = unix_time};
+  packet = add_klv(packet, F_UNIX_TIME_STAMP, unix_time_stamp_value);
 
   // Add mandatory KLV for UAS_LDS version which is ST0601.6
   // Add key tag
@@ -119,16 +112,30 @@ int finalize_packet(struct Packet *packet)
   return 0;
 }
 
-struct Packet *add_klv(struct Packet *packet, enum Tags id,
-                       uint8_t value_length, uint8_t *value,
-                       uint8_t invert)
+struct Packet *add_klv(struct Packet *packet, const struct Field field,
+                       struct GenericValue value)
 {
+  union Offset {
+    float foffset;
+    double doffset;
+  } offset;
+
+  union Res {
+    uint16_t u16res;
+    uint32_t u32res;
+    int16_t s16res;
+    int32_t s32res;
+  } res;
+
+  if (field.value_format != value.type)
+    return NULL;
+
   // The tag field length follow BER-OID encoding to encode the length
   // of the KLV. Since in MISB0601 max tag value is 93, and is under
   // 2**7 - 1 = 127, we know that the length will be encoded in 1 byte.
   // Value length is assumed to be coded in 1 byte.
 
-  if (packet->available_size <= packet->size + 2 + value_length)
+  if (packet->available_size <= packet->size + 2 + field.len)
   {
     packet->content = realloc(packet->content, packet->available_size * 2);
     if (!packet->content)
@@ -137,26 +144,84 @@ struct Packet *add_klv(struct Packet *packet, enum Tags id,
     packet->available_size = packet->available_size * 2;
   }
 
-  packet->content[packet->size++] = id;
-  packet->content[packet->size++] = value_length;
-  for (int i = 0; i < value_length; i++)
-    if (invert)
-      packet->content[packet->size++] = value[value_length - i - 1];
-    else
-      packet->content[packet->size++] = value[i];
+  char *bytes_value = 0;
+  // Conversion if needed
+  if (field.value_format != field.encoded_format)
+  {
+    switch (field.encoded_format)
+    {
+    case UINT16:
+      offset.foffset = (field.range.min.float_value < 0) ? field.range.min.float_value : 0;
+      res.u16res = unsigned_dec_to_int16(value.float_value,
+                                     fabs(field.range.min.float_value) +
+                                     fabs(field.range.max.float_value),
+                                     offset.foffset);
+      bytes_value = (char *)&res.u16res;
+      break;
+    case UINT32:
+      offset.doffset = (field.range.min.float_value < 0) ? field.range.min.float_value : 0;
+      res.u32res = unsigned_dec_to_int32(value.double_value,
+                                                   fabs(field.range.min.double_value) +
+                                                   fabs(field.range.max.double_value),
+                                                   offset.doffset);
+      bytes_value = (char *)&res.u32res;
+      break;
+    case INT16:
+      res.s16res = signed_dec_to_int16(value.float_value,
+                                       fabs(field.range.min.float_value) +
+                                       fabs(field.range.max.float_value));
+      bytes_value = (char *)&res.s16res;
+      break;
+    case INT32:
+      res.s32res = signed_dec_to_int16(value.double_value,
+                                       fabs(field.range.min.double_value) +
+                                       fabs(field.range.max.double_value));
+      bytes_value = (char *)&res.s32res;
+      break;
+    default:
+      // TODO implement missing conversions
+      return NULL;
+    }
+  }
+  else
+  {
+    switch (value.type)
+    {
+    case UINT8:
+      bytes_value = (char *)&value.uint8_value;
+      break;
+    case UINT16:
+      bytes_value = (char *)&value.uint16_value;
+      break;
+    case UINT32:
+      bytes_value = (char *)&value.uint32_value;
+      break;
+    case UINT64:
+      bytes_value = (char *)&value.uint64_value;
+      break;
+    case INT8:
+      bytes_value = (char *)&value.int8_value;
+      break;
+    case INT16:
+      bytes_value = (char *)&value.int16_value;
+      break;
+    case INT32:
+      bytes_value = (char *)&value.int32_value;
+      break;
+    case INT64:
+      bytes_value = (char *)&value.int64_value;
+      break;
+    default :
+      return NULL;
+      break;
+    }
+  }
+
+  packet->content[packet->size++] = field.key;
+  packet->content[packet->size++] = field.len;
+  // We insert backward because of endianess
+  for (int i = 0; i < field.len; i++)
+    packet->content[packet->size++] = bytes_value[field.len - i - 1];
 
   return packet;
 }
-
-// `buff` is a pointer to the first byte in the 16-byte UAS LDS key.
-// `len` is the length from 16-byte UDS key up to 1-byte checksum length.
-unsigned short bcc_16(uint8_t *buff, unsigned short len)
-{
-  // Initialize Checksum and counter variables.
-  unsigned short bcc = 0, i;
-
-  // Sum each 16-bit chunk whitin the buffer into a checksum
-  for (i = 0; i < len; i++)
-    bcc += buff[i] << (8 * ((i + 1) % 2));
-  return bcc;
-} // end of bcc_16()

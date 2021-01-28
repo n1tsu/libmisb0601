@@ -73,10 +73,14 @@ int finalize_packet(struct Packet *packet);
  *
  *  `invert` is a flag to determine if we want to store
  *  the value inverting the bytes.
- *  TODO : find a way to get rid of this flag
+ *
+ *  return NULL on error.
  */
-struct Packet *add_klv(struct Packet *packet, enum Tags id,
-                       uint8_t value_length, uint8_t *value,
-                       uint8_t invert);
+struct Packet *add_klv(struct Packet *packet, const struct Field field,
+                       struct GenericValue value);
+
+// For KLV that contains a variable size (example : Mission ID with a string)
+struct Packet *add_variable_klv(struct Packet *packet, const struct Field field,
+                                struct GenericValue value, size_t size);
 
 #endif /* !PACKET_H */

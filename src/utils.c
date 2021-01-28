@@ -1,7 +1,8 @@
-#include <math.h>
-
 #include "utils.h"
 
+#include <sys/time.h>
+#include <math.h>
+#include <stddef.h>
 
 // INT16
 
@@ -116,4 +117,26 @@ double int32_to_unsigned_dec(int value, float range, double offset)
   double result = 0;
   result = ((double)range / 4294967294.0) * (double)value;
   return result - offset;
+}
+
+
+// `buff` is a pointer to the first byte in the 16-byte UAS LDS key.
+// `len` is the length from 16-byte UDS key up to 1-byte checksum length.
+unsigned short bcc_16(uint8_t *buff, unsigned short len)
+{
+  // Initialize Checksum and counter variables.
+  unsigned short bcc = 0, i;
+
+  // Sum each 16-bit chunk whitin the buffer into a checksum
+  for (i = 0; i < len; i++)
+    bcc += buff[i] << (8 * ((i + 1) % 2));
+  return bcc;
+} // end of bcc_16()
+
+
+uint64_t get_timestamp()
+{
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    return tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
 }

@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdint.h>
+
 /**
  *  Those conversions are from the MISB0601.6 check the official document
  *  for further information.
@@ -94,5 +96,10 @@ int unsigned_dec_to_int32(double value, float range, double offset);
  *  @return the decoded value.
  */
 double int32_to_unsigned_dec(int value, float range, double offset);
+
+// Checksum function from MISB0601 documentation
+unsigned short bcc_16(uint8_t *buff, unsigned short len);
+
+uint64_t get_timestamp();
 
 #endif /* !UTILS_H */
