@@ -1,3 +1,5 @@
+#include <criterion/criterion.h>
+
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -7,12 +9,157 @@
 #include "unpack.h"
 #include "utils.h"
 
-static char mission[9] = "MISSION01";
-static double latitude = 60.1768229669783;
-static double longitude = 128.426759042045;
-static double altitude = 14190.72;
+/**************/
+/* CONVERSION */
+/**************/
+
+Test(Conversion, signed_dec_to_int16)
+{
+    float to_convert = -61.88693;
+    int16_t expected = (int16_t)0xD3FE;
+
+    int16_t result = signed_dec_to_int16(to_convert, 360);
+    cr_assert_eq(result, expected, "got 0x%x and expected 0x%x",
+                 result, expected);
+}
+
+Test(Conversion, int16_to_signed_dec)
+{
+    int16_t to_convert = (int16_t)0xD3FE;
+    float expected = -61.88693;
+
+    float result = int16_to_signed_dec(to_convert, 360);
+    cr_assert_float_eq(result, expected, 0.1, "got %f and expected %f",
+                       result, expected);
+}
+
+Test(Conversion, unsigned_dec_to_int16)
+{
+    float to_convert = 14190.72;
+    uint16_t expected = 0xC220;
+
+    uint16_t result = unsigned_dec_to_int16(to_convert, 19900, 900);
+    cr_assert_eq(result, expected, "got 0x%x and expected 0x%x",
+                 result, expected);
+}
+
+Test(Conversion, int16_to_unsigned_dec)
+{
+    uint16_t to_convert = 0xC221;
+    float expected = 14190.72;
+
+    float result = int16_to_unsigned_dec(to_convert, 19900, 900);
+    cr_assert_float_eq(result, expected, 0.3, "got %f and expected %f",
+                       result, expected);
+}
+
+Test(Conversion, signed_dec_to_int32)
+{
+    float to_convert = 60.1768229669783;
+    int32_t expected = (int32_t)0x5595B666;
+
+    int32_t result = signed_dec_to_int32(to_convert, 180);
+    cr_assert_eq(result, expected, "got 0x%x and expected 0x%x",
+                 result, expected);
+}
+
+Test(Conversion, int32_to_signed_dec)
+{
+    int32_t to_convert = (int32_t)0x5595B66D;
+    float expected = 60.1768229669783;
+
+    int32_t result = int32_to_signed_dec(to_convert, 180);
+    cr_assert_float_eq(result, expected, 0.3, "got %f and expected %f",
+                       result, expected);
+}
 
 
+/***********/
+/* PACKETS */
+/***********/
+
+Test(Packets, initialize)
+{
+    struct Packet *packet = initialize_packet();
+    cr_assert_not_null(packet);
+    cr_assert_eq(packet->ready, 0);
+    // UAS LDS version and timestamp
+    cr_assert_eq(packet->size, 3 + 10, "got %d and expected %d",
+                 packet->size, 3 + 10);
+    free_packet(packet);
+}
+
+Test(Packets, finalize)
+{
+    struct Packet *packet = initialize_packet();
+    int result = finalize_packet(packet);
+    cr_assert_eq(result, 0);
+    cr_assert_eq(packet->ready, 1);
+    // Initialize packet + LDS Key and checksum
+    cr_assert_eq(packet->size, 13 + 4 + 17, "got %d and expected %d",
+                 packet->size, 13 + 4 + 17);
+    free_packet(packet);
+}
+
+Test(Packets, add_klv)
+{
+    struct Packet *packet = initialize_packet();
+    uint64_t timestamp = get_timestamp();
+
+    struct GenericValue value;
+    value.type = UINT64;
+    value.uint64_value = timestamp;
+
+    packet = add_klv(packet, F_UNIX_TIME_STAMP, value);
+    cr_assert_not_null(packet);
+    free_packet(packet);
+}
+
+Test(Packets, save_file)
+{
+    struct Packet *packet = initialize_packet();
+
+    {
+      struct GenericValue value = {FLOAT, .float_value = 159.9744};
+      packet = add_klv(packet, F_PLATFORM_HEADING_ANGLE, value);
+    }
+
+    {
+      char *name = "MISSION01";
+      struct GenericValue value = {CHAR_P, .charp_value = name};
+      packet = add_klv(packet, F_MISSION_ID, value);
+    }
+
+    int result = finalize_packet(packet);
+    cr_assert_eq(result, 0);
+
+    FILE * file;
+    file = fopen("klv_test.bin", "w+");
+    if(!file)
+    {
+        fprintf(stderr, "Unable to create file.\n");
+        return;
+    }
+    fwrite(packet->content, 1, packet->size, file);
+    fclose(file);
+    free_packet(packet);
+}
+
+
+
+/**********/
+/* UNPACK */
+/**********/
+
+/*
+Test(Unpack, valid_unpack)
+{
+    struct Packet *packet = initialize;
+    int result = unpack_misb(data, size, kilvmap);
+}
+*/
+
+/*
 void test_unpack(struct KLVMap *klvmap)
 {
     for (int i = 0; i < 94; i++)
@@ -48,42 +195,9 @@ void test_unpack(struct KLVMap *klvmap)
     }
 }
 
-
-void test_conversion()
-{
-    // Test utils conversions
-    printf("\nTest conversion\n");
-    printf("Encoding -61.88693 : ");
-    printf("0x%x\n", signed_dec_to_int16(-61.88693, 360));
-
-    printf("Decoding 0xD3FE : ");
-    printf("%f\n\n", int16_to_signed_dec(0xD3FE, 360));
-
-    printf("Encoding 14190.72 : ");
-    printf("0x%x\n", unsigned_dec_to_int16(14190.72, 19900, 900));
-
-    printf("Decoding 0xC221 : ");
-    printf("%f\n\n", int16_to_unsigned_dec(0xC221, 19900, 900));
-
-    printf("Encoding 60.1768229669783 : ");
-    printf("0x%x\n", signed_dec_to_int32(60.1768229669783, 180));
-
-    printf("Decoding 0x5595B66D : ");
-    printf("%f\n", int32_to_signed_dec(0x5595B66D, 180));
-}
-
-
 void save_file(struct Packet *packet)
 {
-    FILE * file;
-    file = fopen("klv_test.bin", "w+");
-    if(!file)
-    {
-        fprintf(stderr, "Unable to create file.\n");
-        return;
-    }
-    fwrite(packet->content, 1, packet->size, file);
-    fclose(file);
+
 }
 
 
@@ -137,3 +251,4 @@ int main()
 
     return 0;
 }
+*/

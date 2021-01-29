@@ -199,8 +199,8 @@ static const struct Field F_PLATFORM_HEADING_ANGLE = {
   .encoded_format = UINT16,
   .len = 2,
   .range = {
-    {FLOAT, .uint16_value = 0},
-    {FLOAT, .uint16_value = 360}
+    {FLOAT, .float_value = 0},
+    {FLOAT, .float_value = 360}
   },
 };
 static const struct Field F_PLATFORM_PITCH_ANGLE = {

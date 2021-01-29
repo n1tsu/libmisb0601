@@ -1,7 +1,7 @@
 CC?=gcc
 CFLAGS+=-Wall -Werror -Wextra -pedantic -I. -Iinclude -fPIC -L. -lm
 LIBNAME=libmisb0601.so
-TESTNAME=misb0601-test
+TESTNAME=unit-test
 SRC= \
 	src/packet.c					\
 	src/unpack.c					\
@@ -26,7 +26,7 @@ install: $(LIBNAME)
 	install -m 0644 include/*.h $(DESTDIR)/usr/include/misb0601/
 
 $(TESTNAME): test/test.c
-	$(CC) test/test.c $(CFLAGS) -g -lmisb0601 -o $@
+	$(CC) test/test.c $(CFLAGS) -g -lmisb0601 -lcriterion -o $@
 
 clean:
 	$(RM) $(TESTNAME) $(LIBNAME) $(OBJS) test/test.o klv_test.bin

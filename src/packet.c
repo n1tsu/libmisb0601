@@ -127,6 +127,8 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
     int32_t s32res;
   } res;
 
+  int invert = 1;
+
   if (field.value_format != value.type)
     return NULL;
 
@@ -148,10 +150,11 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
   // Conversion if needed
   if (field.value_format != field.encoded_format)
   {
+
     switch (field.encoded_format)
     {
     case UINT16:
-      offset.foffset = (field.range.min.float_value < 0) ? field.range.min.float_value : 0;
+      offset.foffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
       res.u16res = unsigned_dec_to_int16(value.float_value,
                                      fabs(field.range.min.float_value) +
                                      fabs(field.range.max.float_value),
@@ -159,7 +162,7 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
       bytes_value = (char *)&res.u16res;
       break;
     case UINT32:
-      offset.doffset = (field.range.min.float_value < 0) ? field.range.min.float_value : 0;
+      offset.doffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
       res.u32res = unsigned_dec_to_int32(value.double_value,
                                                    fabs(field.range.min.double_value) +
                                                    fabs(field.range.max.double_value),
@@ -211,6 +214,10 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
     case INT64:
       bytes_value = (char *)&value.int64_value;
       break;
+    case CHAR_P:
+      bytes_value = value.charp_value;
+      invert = 0;
+      break;
     default :
       return NULL;
       break;
@@ -221,7 +228,16 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
   packet->content[packet->size++] = field.len;
   // We insert backward because of endianess
   for (int i = 0; i < field.len; i++)
-    packet->content[packet->size++] = bytes_value[field.len - i - 1];
+  {
+    if (invert)
+      packet->content[packet->size++] = bytes_value[field.len - i - 1];
+    else
+    {
+      packet->content[packet->size++] = bytes_value[i];
+      if (bytes_value[i] == '\0')
+        break;
+    }
+  }
 
   return packet;
 }

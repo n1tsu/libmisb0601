@@ -14,9 +14,9 @@ Usage :
 struct Packet *packet = initialize_packet();
 
 // Add mission name KLV to packet
-char mission[9] = "MISSION01";
-// See packet.h to understand parameters
-packet = add_klv(packet, MISSION_ID, 9, (uint8_t *)mission, 0);
+char *name = "MISSION01";
+struct GenericValue value = {CHAR_P, .charp_value = name};
+packet = add_klv(packet, F_MISSION_ID, value);
 
 // Finalize packet to be ready to being sent
 // Checksum KLV is calculated and added
