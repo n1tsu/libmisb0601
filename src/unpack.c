@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 
 #define checksumByte(i) data[i] << (8 * ((i + 1) % 2))
@@ -54,7 +55,7 @@ size_t packet_length(unsigned short *checksum, size_t *i, unsigned char *data)
   }
 }
 
-struct GenericValue decode_value(const struct Field field, unsigned char *value)
+struct GenericValue decode_value(const struct Field field, unsigned char *value, uint8_t size)
 {
   union Offset {
     float foffset;
@@ -131,7 +132,9 @@ struct GenericValue decode_value(const struct Field field, unsigned char *value)
       result.int64_value = (int64_t)*value;
       return result;
     case CHAR_P:
-      result.charp_value = (char *)value;
+      result.charp_value = malloc((size + 1) * sizeof(char));
+      memcpy(result.charp_value, (char *)value, size);
+      result.charp_value[size] = '\0';
       return result;
     default :
       // TODO Handle properly error
@@ -166,7 +169,7 @@ int unpack_misb(unsigned char *data, size_t size, struct KLVMap *klvmap)
   packet_length(&expected_checksum, &i, data);
 
   // KLVs
-  while (i != size)
+  while (i < size)
   {
     struct KLV *klv = malloc(sizeof(struct KLV));
 
@@ -180,7 +183,7 @@ int unpack_misb(unsigned char *data, size_t size, struct KLVMap *klvmap)
 
     klv->tag = klv_tag;
     klv->size = klv_size;
-    struct GenericValue value = decode_value(FieldMap[klv_tag], data + i);
+    struct GenericValue value = decode_value(FieldMap[klv_tag], data + i, klv_size);
     klv->value = value;
 
     // Calculate checksum for the content of the KLV.

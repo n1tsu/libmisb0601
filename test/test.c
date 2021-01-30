@@ -151,104 +151,84 @@ Test(Packets, save_file)
 /* UNPACK */
 /**********/
 
-/*
 Test(Unpack, valid_unpack)
 {
-    struct Packet *packet = initialize;
-    int result = unpack_misb(data, size, kilvmap);
-}
-*/
-
-/*
-void test_unpack(struct KLVMap *klvmap)
-{
-    for (int i = 0; i < 94; i++)
-    {
-        if (klvmap->KLVs[i])
-        {
-            printf("Tag %d - Size %zu\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
-            int data;
-            unsigned short s_data;
-            switch (i)
-            {
-            case 13:
-              data = (*klvmap->KLVs[i]->data << 24) + (*(klvmap->KLVs[i]->data + 1) << 16) +
-                     (*(klvmap->KLVs[i]->data + 2) << 8) + *(klvmap->KLVs[i]->data + 3);
-              printf("  * Sensor latitude is %f\n", int32_to_signed_dec(data, 180));
-              printf("  * Expected is %f\n", latitude);
-              break;
-            case 14:
-              data = (*klvmap->KLVs[i]->data << 24) + (*(klvmap->KLVs[i]->data + 1) << 16) +
-                     (*(klvmap->KLVs[i]->data + 2) << 8) + *(klvmap->KLVs[i]->data + 3);
-              printf("  * Sensor longitude is %f\n", int32_to_signed_dec(data, 360));
-              printf("  * Expected is %f\n", longitude);
-              break;
-            case 15:
-              s_data =  (*klvmap->KLVs[i]->data << 8) + *(klvmap->KLVs[i]->data + 1);
-              printf("  * Sensor altitude is %f\n", int16_to_unsigned_dec(s_data, 19900, 900));
-              printf("  * Expected is %f\n", altitude);
-              break;
-            default:
-              break;
-            }
-        }
-    }
-}
-
-void save_file(struct Packet *packet)
-{
-
-}
-
-
-struct Packet *add_klvs(struct Packet *packet)
-{
-    printf("KLVS :\n");
-    printf("Mission name is %s\n", mission);
-    printf("Latitude is %f\n", latitude);
-    printf("Longitude is %f\n", longitude);
-    printf("Altitude is %f\n", altitude);
-
-    packet = add_klv(packet, MISSION_ID, 9, (uint8_t *)mission, 0);
-    int encoded_latitude_degree = signed_dec_to_int32(latitude, 180);
-    packet = add_klv(packet, SENSOR_LATITUDE, 4, (uint8_t*)&encoded_latitude_degree, 1);
-    int encoded_longitude_degree = signed_dec_to_int32(longitude, 360);
-    packet = add_klv(packet, SENSOR_LONGITUDE, 4, (uint8_t*)&encoded_longitude_degree, 1);
-    unsigned short encoded_altitude = unsigned_dec_to_int16(altitude, 19900, 900);
-    packet = add_klv(packet, SENSOR_TRUE_ALTITUDE, 2, (uint8_t*)&encoded_altitude, 1);
-
-    return packet;
-}
-
-
-int main()
-{
-    // Create a packet
     struct Packet *packet = initialize_packet();
-    packet = add_klvs(packet);
+
+    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
     finalize_packet(packet);
 
-    // Save into file
-    save_file(packet);
+    int result = unpack_misb(packet->content, packet->size, klvmap);
 
-    // Unpack the packet
-    printf("\nUnpacking :\n");
-    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
-
-    for (int i = 0; i < 94; i++)
-        klvmap->KLVs[i] = NULL;
-
-    int res = unpack_misb(packet->content, packet->size, klvmap);
-    if (res)
-      fprintf(stderr, "Error unpacking the packet : %d\n", res);
-
-    test_unpack(klvmap);
+    cr_assert_eq(result, 0, "got %d and expected %d",
+                 result, 0);
+    cr_assert_eq(klvmap->KLVs[CHECKSUM]->tag, CHECKSUM, "got %d and expected %d",
+                 klvmap->KLVs[CHECKSUM]->tag, CHECKSUM);
 
     free_packet(packet);
     free(klvmap);
-
-    test_conversion();
-
-    return 0;
 }
-*/
+
+Test(Unpack, unpack_version)
+{
+    struct Packet *packet = initialize_packet();
+
+    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
+    finalize_packet(packet);
+
+    int result = unpack_misb(packet->content, packet->size, klvmap);
+
+    cr_assert_eq(result, 0, "got %d and expected %d",
+                 result, 0);
+    cr_assert_eq(klvmap->KLVs[UAS_LDS_VERSION_NUMBER]->tag, UAS_LDS_VERSION_NUMBER, "got %d and expected %d",
+                 klvmap->KLVs[UAS_LDS_VERSION_NUMBER]->tag, UAS_LDS_VERSION_NUMBER);
+    cr_assert_eq(klvmap->KLVs[UAS_LDS_VERSION_NUMBER]->value.uint8_value, 6, "got %d and expected %d",
+                 klvmap->KLVs[UAS_LDS_VERSION_NUMBER]->value.uint8_value, 6);
+
+    free_packet(packet);
+    free(klvmap);
+}
+
+Test(Unpack, unpack_present)
+{
+    struct Packet *packet = initialize_packet();
+
+    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
+    finalize_packet(packet);
+
+    int result = unpack_misb(packet->content, packet->size, klvmap);
+
+    cr_assert_eq(result, 0, "got %d and expected %d",
+                 result, 0);
+    cr_assert_neq(klvmap->KLVs[UAS_LDS_VERSION_NUMBER], NULL, "got %d and not expected %d",
+                 klvmap->KLVs[UAS_LDS_VERSION_NUMBER], NULL);
+    cr_assert_eq(klvmap->KLVs[SLANT_RANGE], NULL, "got %d and expected %d",
+                 klvmap->KLVs[SLANT_RANGE], NULL);
+
+    free_packet(packet);
+    free(klvmap);
+}
+
+
+Test(Unpack, unpack_mission)
+{
+    struct Packet *packet = initialize_packet();
+
+    char *name = "MISSION01";
+    struct GenericValue value = {CHAR_P, .charp_value = name};
+    packet = add_klv(packet, FieldMap[MISSION_ID], value);
+    finalize_packet(packet);
+
+    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
+    int result = unpack_misb(packet->content, packet->size, klvmap);
+
+    cr_assert_eq(result, 0, "got %d and expected %d",
+                 result, 0);
+    cr_assert_eq(klvmap->KLVs[MISSION_ID]->tag, MISSION_ID, "got %d and expected %d",
+                 klvmap->KLVs[MISSION_ID]->tag, MISSION_ID);
+    cr_assert_str_eq(klvmap->KLVs[MISSION_ID]->value.charp_value, "MISSION01", "got %s and expected %s",
+                     klvmap->KLVs[MISSION_ID]->value.charp_value, "MISSION01");
+
+    free_packet(packet);
+    free(klvmap);
+}

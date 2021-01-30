@@ -195,11 +195,15 @@ char *encode_value(const struct Field field, struct GenericValue *value)
 struct Packet *add_klv(struct Packet *packet, const struct Field field,
                        struct GenericValue value)
 {
+  uint8_t field_len = field.len;
+  if (value.type == CHAR_P)
+    field_len = strlen(value.charp_value);
+
   if (field.value_format != value.type)
     return NULL;
 
   // Increase allocated size if necessary
-  if (packet->available_size <= packet->size + 2 + field.len)
+  if (packet->available_size <= packet->size + 2 + field_len)
   {
     packet->content = realloc(packet->content, packet->available_size * 2);
     if (!packet->content)
@@ -213,12 +217,12 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
     return NULL;
 
   packet->content[packet->size++] = field.key;
-  packet->content[packet->size++] = field.len;
-  for (int i = 0; i < field.len; i++)
+  packet->content[packet->size++] = field_len;
+  for (int i = 0; i < field_len; i++)
   {
     // Because of endianess we insert backward, except when dealing with char*
     if (value.type != CHAR_P)
-      packet->content[packet->size++] = bytes_value[field.len - i - 1];
+      packet->content[packet->size++] = bytes_value[field_len - i - 1];
     else
     {
       packet->content[packet->size++] = bytes_value[i];
