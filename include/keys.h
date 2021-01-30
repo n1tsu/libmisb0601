@@ -153,929 +153,942 @@ enum Tags {
 };
 
 
-static const struct Field F_CHECKSUM = {
-  .key = CHECKSUM,
-  .encoded_format = UINT16,
-  .value_format = UINT16,
-  .len = 2,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 65535}
-  },
-};
-static const struct Field F_UNIX_TIME_STAMP = {
-  .key = UNIX_TIME_STAMP,
-  .encoded_format = UINT64,
-  .value_format = UINT64,
-  .len = 8,
-  .range = {
-    {UINT64, .uint64_value = 0},
-    {UINT64, .uint64_value = 18446744073709551615U}
-  },
-};
-static const struct Field F_MISSION_ID = {
-  .key = MISSION_ID,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_PLATFORM_TAIL_NUMBER = {
-  .key = PLATFORM_TAIL_NUMBER,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_PLATFORM_HEADING_ANGLE = {
-  .key = PLATFORM_HEADING_ANGLE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 360}
-  },
-};
-static const struct Field F_PLATFORM_PITCH_ANGLE = {
-  .key = PLATFORM_PITCH_ANGLE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -20},
-    {FLOAT, .float_value = 20}
-  },
-};
-static const struct Field F_PLATFORM_ROLL_ANGLE = {
-  .key = PLATFORM_ROLL_ANGLE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -50},
-    {FLOAT, .float_value = 50}
-  },
-};
-static const struct Field F_PLATFORM_TRUE_AIRSPEED = {
-  .key = PLATFORM_TRUE_AIRSPEED,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_PLATFORM_INDICATED_AIRSPEED = {
-  .key = PLATFORM_INDICATED_AIRSPEED,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_PLATFORM_DESIGNATION = {
-  .key = PLATFORM_DESIGNATION,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_IMAGE_SOURCE_SENSOR = {
-  .key = IMAGE_SOURCE_SENSOR,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_IMAGE_COORDINATE_SYSTEM = {
-  .key = IMAGE_COORDINATE_SYSTEM,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_SENSOR_LATITUDE = {
-  .key = SENSOR_LATITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_SENSOR_LONGITUDE = {
-  .key = SENSOR_LONGITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_SENSOR_TRUE_ALTITUDE = {
-  .key = SENSOR_TRUE_ALTITUDE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {DOUBLE, .double_value = -900},
-    {DOUBLE, .double_value = 19000}
-  },
-};
-static const struct Field F_SENSOR_HORIZONTAL_FOV = {
-  .key = SENSOR_HORIZONTAL_FOV,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_SENSOR_VERTICAL_FOV = {
-  .key = SENSOR_VERTICAL_FOV,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_SENSOR_RELATIVE_AZIMUTH_ANGLE = {
-  .key = SENSOR_RELATIVE_AZIMUTH_ANGLE,
-  .value_format = DOUBLE,
-  .encoded_format = UINT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 360}
-  },
-};
-static const struct Field F_SENSOR_RELATIVE_ROLL_ANGLE = {
-  .key = SENSOR_RELATIVE_ROLL_ANGLE,
-  .value_format = DOUBLE,
-  .encoded_format = UINT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 360}
-  },
-};
-static const struct Field F_SLANT_RANGE = {
-  .key = SLANT_RANGE,
-  .value_format = FLOAT,
-  .encoded_format = UINT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 5000000}
-  },
-};
-static const struct Field F_TARGET_WIDTH = {
-  .key = TARGET_WIDTH,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 10000}
-  },
-};
-static const struct Field F_FRAME_CENTER_LATITUDE = {
-  .key = FRAME_CENTER_LATITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_FRAME_CENTER_LONGITUDE = {
-  .key = FRAME_CENTER_LONGITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_FRAME_CENTER_ELEVATION = {
-  .key = FRAME_CENTER_ELEVATION,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LATITUDE_POINT_1 = {
-  .key = OFFSET_CORNER_LATITUDE_POINT_1,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LONGITUDE_POINT_1 = {
-  .key = OFFSET_CORNER_LONGITUDE_POINT_1,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LATITUDE_POINT_2 = {
-  .key = OFFSET_CORNER_LATITUDE_POINT_2,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LONGITUDE_POINT_2 = {
-  .key = OFFSET_CORNER_LONGITUDE_POINT_2,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LATITUDE_POINT_3 = {
-  .key = OFFSET_CORNER_LATITUDE_POINT_3,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LONGITUDE_POINT_3 = {
-  .key = OFFSET_CORNER_LONGITUDE_POINT_3,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LATITUDE_POINT_4 = {
-  .key = OFFSET_CORNER_LATITUDE_POINT_4,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_OFFSET_CORNER_LONGITUDE_POINT_4 = {
-  .key = OFFSET_CORNER_LONGITUDE_POINT_4,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -0.075},
-    {FLOAT, .float_value = 0.075}
-  },
-};
-static const struct Field F_ICING_DETECTED = {
-  .key = ICING_DETECTED,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_WIND_DIRECTION = {
-  .key = WIND_DIRECTION,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 360}
-  },
-};
-static const struct Field F_WIND_SPEED = {
-  .key = WIND_SPEED,
-  .value_format = FLOAT,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 100}
-  },
-};
-static const struct Field F_STATIC_PRESSURE = {
-  .key = STATIC_PRESSURE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 5000}
-  },
-};
-static const struct Field F_DENSITY_ALTITUDE = {
-  .key = DENSITY_ALTITUDE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_OUTSIDE_AIR_TEMPERATURE = {
-  .key = OUTSIDE_AIR_TEMPERATURE,
-  .value_format = INT8,
-  .encoded_format = INT8,
-  .len = 1,
-  .range = {
-    {INT8, .int8_value = -128},
-    {INT8, .int8_value = 127}
-  },
-};
-static const struct Field F_TARGET_LOCATION_LATITUDE = {
-  .key = TARGET_LOCATION_LATITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_TARGET_LOCATION_LONGITUDE = {
-  .key = TARGET_LOCATION_LONGITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_TARGET_LOCATION_ELEVATION = {
-  .key = TARGET_LOCATION_ELEVATION,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_TARGET_TRACK_GATE_WIDTH = {
-  .key = TARGET_TRACK_GATE_WIDTH,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 512}
-  },
-};
-static const struct Field F_TARGET_TRACK_GATE_HEIGHT = {
-  .key = TARGET_TRACK_GATE_HEIGHT,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 512}
-  },
-};
-static const struct Field F_TARGET_ERROR_ESTIMATE_CE90 = {
-  .key = TARGET_ERROR_ESTIMATE_CE90,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 4095}
-  },
-};
-static const struct Field F_TARGET_ERROR_ESTIMATE_LE90 = {
-  .key = TARGET_ERROR_ESTIMATE_LE90,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 4095}
-  },
-};
-static const struct Field F_GENERIC_FLAG_DATA1 = {
-  .key = GENERIC_FLAG_DATA1,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 255}
-  },
-};
-// TODO really not ready to be used, information are dummies
-static const struct Field F_SECURITY_LOCAL_METADATA_SET = {
-  .key = SECURITY_LOCAL_METADATA_SET,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 255}
-  },
-};
-static const struct Field F_DIFFERENTIAL_PRESSURE = {
-  .key = DIFFERENTIAL_PRESSURE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 5000}
-  },
-};
-static const struct Field F_PLATFORM_ANGLE_OF_ATTACK = {
-  .key = PLATFORM_ANGLE_OF_ATTACK,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -20},
-    {FLOAT, .float_value = 20}
-  },
-};
-static const struct Field F_PLATFORM_VERTICAL_SPEED = {
-  .key = PLATFORM_VERTICAL_SPEED,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -180},
-    {FLOAT, .float_value = 180}
-  },
-};
-static const struct Field F_PLATFORM_SIDESLIP_ANGLE = {
-  .key = PLATFORM_SIDESLIP_ANGLE,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -20},
-    {FLOAT, .float_value = 20}
-  },
-};
-static const struct Field F_AIRFIELD_BAROMETRIC_PRESSURE = {
-  .key = AIRFIELD_BAROMETRIC_PRESSURE,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 5000}
-  },
-};
-static const struct Field F_AIRFIELD_ELEVATION = {
-  .key = AIRFIELD_ELEVATION,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_RELATIVE_HUMIDITY = {
-  .key = RELATIVE_HUMIDITY,
-  .value_format = FLOAT,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 100}
-  },
-};
-static const struct Field F_PLATFORM_GROUND_SPEED = {
-  .key = PLATFORM_GROUND_SPEED,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 255}
-  },
-};
-static const struct Field F_GROUND_RANGE = {
-  .key = GROUND_RANGE,
-  .value_format = DOUBLE,
-  .encoded_format = UINT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 5000000}
-  },
-};
-static const struct Field F_PLATFORM_FUEL_REMAINING = {
-  .key = PLATFORM_FUEL_REMAINING,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {DOUBLE, .double_value = 0},
-    {DOUBLE, .double_value = 10000}
-  },
-};
-static const struct Field F_PLATFORM_CALL_SIGN = {
-  .key = PLATFORM_CALL_SIGN,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 1},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_WEAPON_LOAD = {
-  .key = WEAPON_LOAD,
-  .value_format = UINT16,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 65535}
-  },
-};
-static const struct Field F_WEAPON_FIRED = {
-  .key = WEAPON_FIRED,
-  .value_format = UINT16,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 65535}
-  },
-};
-static const struct Field F_LASER_PRF = {
-  .key = LASER_PRF_CODE,
-  .value_format = UINT16,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 65535}
-  },
-};
-static const struct Field F_SENSOR_FOV_NAME = {
-  .key = SENSOR_FOV_NAME,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_PLATFORM_MAGNETIC_HEADING = {
-  .key = PLATFORM_MAGNETIC_HEADING,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {UINT16, .uint16_value = 0},
-    {UINT16, .uint16_value = 360}
-  },
-};
-static const struct Field F_UAS_LDS_VERSION_NUMBER = {
-  .key = UAS_LDS_VERSION_NUMBER,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-// Parameters unused in the MISB0601.6
-static const struct Field F_TARGET_LOCATION_COVARIANCE_MATRIX = {
-  .key = TARGET_LOCATION_COVARIANCE_MATRIX,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_ALTERNATE_PLATFORM_LATITUDE = {
-  .key = ALTERNATE_PLATFORM_LATITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_ALTERNATE_PLATFORM_LONGITUDE = {
-  .key = ALTERNATE_PLATFORM_LONGITUDE,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_ALTERNATE_PLATFORM_ALTITUDE = {
-  .key = ALTERNATE_PLATFORM_ALTITUDE,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_ALTERNATE_PLATFORM_NAME = {
-  .key = ALTERNATE_PLATFORM_NAME,
-  .value_format = CHAR_P,
-  .encoded_format = CHAR_P,
-  .len = 127,
-  .range = {
-    {UINT8, .uint8_value = 1},
-    {UINT8, .uint8_value = 127}
-  },
-};
-static const struct Field F_ALTERNATE_PLATFORM_HEADING = {
-  .key = ALTERNATE_PLATFORM_HEADING,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = 0},
-    {FLOAT, .float_value = 360}
-  },
-};
-static const struct Field F_EVENT_START_TIME_UTC = {
-  .key = EVENT_START_TIME_UTC,
-  .value_format = UINT64,
-  .encoded_format = UINT64,
-  .len = 4,
-  .range = {
-    {UINT64, .uint64_value = 0},
-    {UINT64, .uint64_value = 18446744073709551615U}
-  },
-};
-// TODO this parameter is not handled
-static const struct Field F_RVT_LOCAL_DATA_SET = {
-  .key = RVT_LOCAL_DATA_SET,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-// TODO this parameter is not handled
-static const struct Field F_VMTI_LOCAL_DATA_SET = {
-  .key = VMTI_LOCAL_DATA_SET,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_SENSOR_ELLIPSOID_HEIGHT = {
-  .key = SENSOR_ELLIPSOID_HEIGHT,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_ALTERNATE_PLATFORM_ELLIPSOID_HEIGHT = {
-  .key = ALTERNATE_PLATFORM_ELLIPSOID_HEIGHT,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_OPERATIONAL_MODE = {
-  .key = OPERATIONAL_MODE,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_FRAME_CENTER_HEIGHT_ABOVE_ELLIPSOID = {
-  .key = FRAME_CENTER_HEIGHT_ABOVE_ELLIPSOID,
-  .value_format = FLOAT,
-  .encoded_format = UINT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -900},
-    {FLOAT, .float_value = 19000}
-  },
-};
-static const struct Field F_SENSOR_NORTH_VELOCITY = {
-  .key = SENSOR_NORTH_VELOCITY,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -357},
-    {FLOAT, .float_value = 357}
-  },
-};
-static const struct Field F_SENSOR_EAST_VELOCITY = {
-  .key = SENSOR_EAST_VELOCITY,
-  .value_format = FLOAT,
-  .encoded_format = INT16,
-  .len = 2,
-  .range = {
-    {FLOAT, .float_value = -357},
-    {FLOAT, .float_value = 357}
-  },
-};
-static const struct Field F_IMAGE_HORIZON_PIXEL_PACK = {
-  .key = IMAGE_HORIZON_PIXEL_PACK,
-  .value_format = UINT8,
-  .encoded_format = UINT8,
-  .len = 1,
-  .range = {
-    {UINT8, .uint8_value = 0},
-    {UINT8, .uint8_value = 255}
-  },
-};
-static const struct Field F_CORNER_LATITUDE_POINT_1 = {
-  .key = CORNER_LATITUDE_POINT_1,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_CORNER_LONGITUDE_POINT_1 = {
-  .key = CORNER_LONGITUDE_POINT_1,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_CORNER_LATITUDE_POINT_2 = {
-  .key = CORNER_LATITUDE_POINT_2,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_CORNER_LONGITUDE_POINT_2 = {
-  .key = CORNER_LONGITUDE_POINT_3,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_CORNER_LATITUDE_POINT_3 = {
-  .key = CORNER_LATITUDE_POINT_4,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_CORNER_LONGITUDE_POINT_3 = {
-  .key = CORNER_LONGITUDE_POINT_4,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_CORNER_LATITUDE_POINT_4 = {
-  .key = CORNER_LATITUDE_POINT_1,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_CORNER_LONGITUDE_POINT_4 = {
-  .key = CORNER_LONGITUDE_POINT_1,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
-};
-static const struct Field F_PLATFORM_PITCH_ANGLE_F = {
-  .key = PLATFORM_PITCH_ANGLE_F,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_PLATFORM_ROLL_ANGLE_F = {
-  .key = PLATFORM_ROLL_ANGLE_F,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_PLATFORM_ANGLE_OF_ATTACK_F = {
-  .key = PLATFORM_ANGLE_OF_ATTACK,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -90},
-    {DOUBLE, .double_value = 90}
-  },
-};
-static const struct Field F_PLATFORM_SIDESLIP_ANGLE_F = {
-  .key = PLATFORM_SIDESLIP_ANGLE_F,
-  .value_format = DOUBLE,
-  .encoded_format = INT32,
-  .len = 4,
-  .range = {
-    {DOUBLE, .double_value = -180},
-    {DOUBLE, .double_value = 180}
-  },
+static const struct Field FieldMap[94] = {
+  // First one is dummy to align index with tag number
+  {
+    .key = CHECKSUM,
+    .encoded_format = UINT16,
+    .value_format = UINT16,
+    .len = 2,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 65535}
+    },
+  },
+  {
+    .key = CHECKSUM,
+    .encoded_format = UINT16,
+    .value_format = UINT16,
+    .len = 2,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 65535}
+    },
+  },
+  {
+    .key = UNIX_TIME_STAMP,
+    .encoded_format = UINT64,
+    .value_format = UINT64,
+    .len = 8,
+    .range = {
+      {UINT64, .uint64_value = 0},
+      {UINT64, .uint64_value = 18446744073709551615U}
+    },
+  },
+  {
+    .key = MISSION_ID,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = PLATFORM_TAIL_NUMBER,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = PLATFORM_HEADING_ANGLE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 360}
+    },
+  },
+  {
+    .key = PLATFORM_PITCH_ANGLE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -20},
+      {FLOAT, .float_value = 20}
+    },
+  },
+  {
+    .key = PLATFORM_ROLL_ANGLE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -50},
+      {FLOAT, .float_value = 50}
+    },
+  },
+  {
+    .key = PLATFORM_TRUE_AIRSPEED,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = PLATFORM_INDICATED_AIRSPEED,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = PLATFORM_DESIGNATION,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = IMAGE_SOURCE_SENSOR,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = IMAGE_COORDINATE_SYSTEM,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = SENSOR_LATITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = SENSOR_LONGITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = SENSOR_TRUE_ALTITUDE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {DOUBLE, .double_value = -900},
+      {DOUBLE, .double_value = 19000}
+    },
+  },
+  {
+    .key = SENSOR_HORIZONTAL_FOV,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = SENSOR_VERTICAL_FOV,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = SENSOR_RELATIVE_AZIMUTH_ANGLE,
+    .value_format = DOUBLE,
+    .encoded_format = UINT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 360}
+    },
+  },
+  {
+    .key = SENSOR_RELATIVE_ROLL_ANGLE,
+    .value_format = DOUBLE,
+    .encoded_format = UINT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 360}
+    },
+  },
+  {
+    .key = SLANT_RANGE,
+    .value_format = FLOAT,
+    .encoded_format = UINT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 5000000}
+    },
+  },
+  {
+    .key = TARGET_WIDTH,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 10000}
+    },
+  },
+  {
+    .key = FRAME_CENTER_LATITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = FRAME_CENTER_LONGITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = FRAME_CENTER_ELEVATION,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LATITUDE_POINT_1,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LONGITUDE_POINT_1,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LATITUDE_POINT_2,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LONGITUDE_POINT_2,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LATITUDE_POINT_3,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LONGITUDE_POINT_3,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LATITUDE_POINT_4,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = OFFSET_CORNER_LONGITUDE_POINT_4,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -0.075},
+      {FLOAT, .float_value = 0.075}
+    },
+  },
+  {
+    .key = ICING_DETECTED,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = WIND_DIRECTION,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 360}
+    },
+  },
+  {
+    .key = WIND_SPEED,
+    .value_format = FLOAT,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 100}
+    },
+  },
+  {
+    .key = STATIC_PRESSURE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 5000}
+    },
+  },
+  {
+    .key = DENSITY_ALTITUDE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = OUTSIDE_AIR_TEMPERATURE,
+    .value_format = INT8,
+    .encoded_format = INT8,
+    .len = 1,
+    .range = {
+      {INT8, .int8_value = -128},
+      {INT8, .int8_value = 127}
+    },
+  },
+  {
+    .key = TARGET_LOCATION_LATITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = TARGET_LOCATION_LONGITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = TARGET_LOCATION_ELEVATION,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = TARGET_TRACK_GATE_WIDTH,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 512}
+    },
+  },
+  {
+    .key = TARGET_TRACK_GATE_HEIGHT,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 512}
+    },
+  },
+  {
+    .key = TARGET_ERROR_ESTIMATE_CE90,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 4095}
+    },
+  },
+  {
+    .key = TARGET_ERROR_ESTIMATE_LE90,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 4095}
+    },
+  },
+  {
+    .key = GENERIC_FLAG_DATA1,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 255}
+    },
+  },
+  // TODO really not ready to be used, information are dummies
+  {
+    .key = SECURITY_LOCAL_METADATA_SET,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 255}
+    },
+  },
+  {
+    .key = DIFFERENTIAL_PRESSURE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 5000}
+    },
+  },
+  {
+    .key = PLATFORM_ANGLE_OF_ATTACK,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -20},
+      {FLOAT, .float_value = 20}
+    },
+  },
+  {
+    .key = PLATFORM_VERTICAL_SPEED,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -180},
+      {FLOAT, .float_value = 180}
+    },
+  },
+  {
+    .key = PLATFORM_SIDESLIP_ANGLE,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -20},
+      {FLOAT, .float_value = 20}
+    },
+  },
+  {
+    .key = AIRFIELD_BAROMETRIC_PRESSURE,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 5000}
+    },
+  },
+  {
+    .key = AIRFIELD_ELEVATION,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = RELATIVE_HUMIDITY,
+    .value_format = FLOAT,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 100}
+    },
+  },
+  {
+    .key = PLATFORM_GROUND_SPEED,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 255}
+    },
+  },
+  {
+    .key = GROUND_RANGE,
+    .value_format = DOUBLE,
+    .encoded_format = UINT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 5000000}
+    },
+  },
+  {
+    .key = PLATFORM_FUEL_REMAINING,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {DOUBLE, .double_value = 0},
+      {DOUBLE, .double_value = 10000}
+    },
+  },
+  {
+    .key = PLATFORM_CALL_SIGN,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 1},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = WEAPON_LOAD,
+    .value_format = UINT16,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 65535}
+    },
+  },
+  {
+    .key = WEAPON_FIRED,
+    .value_format = UINT16,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 65535}
+    },
+  },
+  {
+    .key = LASER_PRF_CODE,
+    .value_format = UINT16,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 65535}
+    },
+  },
+  {
+    .key = SENSOR_FOV_NAME,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = PLATFORM_MAGNETIC_HEADING,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {UINT16, .uint16_value = 0},
+      {UINT16, .uint16_value = 360}
+    },
+  },
+  {
+    .key = UAS_LDS_VERSION_NUMBER,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  // Parameters unused in the MISB0601.6
+  {
+    .key = TARGET_LOCATION_COVARIANCE_MATRIX,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = ALTERNATE_PLATFORM_LATITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = ALTERNATE_PLATFORM_LONGITUDE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = ALTERNATE_PLATFORM_ALTITUDE,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = ALTERNATE_PLATFORM_NAME,
+    .value_format = CHAR_P,
+    .encoded_format = CHAR_P,
+    .len = 127,
+    .range = {
+      {UINT8, .uint8_value = 1},
+      {UINT8, .uint8_value = 127}
+    },
+  },
+  {
+    .key = ALTERNATE_PLATFORM_HEADING,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = 0},
+      {FLOAT, .float_value = 360}
+    },
+  },
+  {
+    .key = EVENT_START_TIME_UTC,
+    .value_format = UINT64,
+    .encoded_format = UINT64,
+    .len = 4,
+    .range = {
+      {UINT64, .uint64_value = 0},
+      {UINT64, .uint64_value = 18446744073709551615U}
+    },
+  },
+  // TODO this parameter is not handled
+  {
+    .key = RVT_LOCAL_DATA_SET,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  // TODO this parameter is not handled
+  {
+    .key = VMTI_LOCAL_DATA_SET,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = SENSOR_ELLIPSOID_HEIGHT,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = ALTERNATE_PLATFORM_ELLIPSOID_HEIGHT,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = OPERATIONAL_MODE,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = FRAME_CENTER_HEIGHT_ABOVE_ELLIPSOID,
+    .value_format = FLOAT,
+    .encoded_format = UINT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -900},
+      {FLOAT, .float_value = 19000}
+    },
+  },
+  {
+    .key = SENSOR_NORTH_VELOCITY,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -357},
+      {FLOAT, .float_value = 357}
+    },
+  },
+  {
+    .key = SENSOR_EAST_VELOCITY,
+    .value_format = FLOAT,
+    .encoded_format = INT16,
+    .len = 2,
+    .range = {
+      {FLOAT, .float_value = -357},
+      {FLOAT, .float_value = 357}
+    },
+  },
+  {
+    .key = IMAGE_HORIZON_PIXEL_PACK,
+    .value_format = UINT8,
+    .encoded_format = UINT8,
+    .len = 1,
+    .range = {
+      {UINT8, .uint8_value = 0},
+      {UINT8, .uint8_value = 255}
+    },
+  },
+  {
+    .key = CORNER_LATITUDE_POINT_1,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = CORNER_LONGITUDE_POINT_1,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = CORNER_LATITUDE_POINT_2,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = CORNER_LONGITUDE_POINT_3,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = CORNER_LATITUDE_POINT_4,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = CORNER_LONGITUDE_POINT_4,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = CORNER_LATITUDE_POINT_1,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = CORNER_LONGITUDE_POINT_1,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
+    .key = PLATFORM_PITCH_ANGLE_F,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = PLATFORM_ROLL_ANGLE_F,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = PLATFORM_ANGLE_OF_ATTACK,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -90},
+      {DOUBLE, .double_value = 90}
+    },
+  },
+  {
+    .key = PLATFORM_SIDESLIP_ANGLE_F,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  }
 };
 
 

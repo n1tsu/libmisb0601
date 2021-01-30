@@ -110,7 +110,7 @@ Test(Packets, add_klv)
     value.type = UINT64;
     value.uint64_value = timestamp;
 
-    packet = add_klv(packet, F_UNIX_TIME_STAMP, value);
+    packet = add_klv(packet, FieldMap[UNIX_TIME_STAMP], value);
     cr_assert_not_null(packet);
     free_packet(packet);
 }
@@ -121,13 +121,13 @@ Test(Packets, save_file)
 
     {
       struct GenericValue value = {FLOAT, .float_value = 159.9744};
-      packet = add_klv(packet, F_PLATFORM_HEADING_ANGLE, value);
+      packet = add_klv(packet, FieldMap[PLATFORM_HEADING_ANGLE], value);
     }
 
     {
       char *name = "MISSION01";
       struct GenericValue value = {CHAR_P, .charp_value = name};
-      packet = add_klv(packet, F_MISSION_ID, value);
+      packet = add_klv(packet, FieldMap[MISSION_ID], value);
     }
 
     int result = finalize_packet(packet);

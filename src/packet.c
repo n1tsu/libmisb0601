@@ -5,6 +5,32 @@
 #include <stdlib.h>
 #include <math.h>
 
+// This routine is creating a new packet with Universal Key, final size of the
+// packet, and allocate enough memory to contains `new_size` klv data.
+uint8_t *create_final_packet(int len_size, int new_size)
+{
+  int key_size = 16;
+  int LDS_KL_size = key_size + len_size;
+  uint8_t *LDS_KL = malloc((new_size + LDS_KL_size) * sizeof(uint8_t));
+  memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
+
+  if (len_size == 1)
+    LDS_KL[key_size] = (uint8_t)new_size;
+  else if (len_size == 2)
+  {
+    LDS_KL[key_size] = (1 << 7) + 1;
+    LDS_KL[key_size + 1] = (uint8_t)new_size;
+  }
+  else
+  {
+    LDS_KL[key_size] = (1 << 7) + 2;
+    LDS_KL[key_size + 1] = (uint8_t)new_size >> 8;
+    LDS_KL[key_size + 2] = (uint8_t)new_size;
+   }
+
+  return LDS_KL;
+}
+
 
 struct Packet *initialize_packet()
 {
@@ -24,7 +50,7 @@ struct Packet *initialize_packet()
   // Add mandatory Timestamp KLV which needs to be the first klv
   uint64_t unix_time = get_timestamp();
   struct GenericValue unix_time_stamp_value = {UINT64, .uint64_value = unix_time};
-  packet = add_klv(packet, F_UNIX_TIME_STAMP, unix_time_stamp_value);
+  packet = add_klv(packet, FieldMap[UNIX_TIME_STAMP], unix_time_stamp_value);
 
   // Add mandatory KLV for UAS_LDS version which is ST0601.6
   // Add key tag
@@ -52,8 +78,6 @@ int finalize_packet(struct Packet *packet)
   packet->size += 1 + 1 + 2;
   int new_size = packet->size;
 
-  int LDS_KL_size = 0;
-
   // LDS length field size is determined via BER short/long encoding.
   // LDS_K_size is the size of the key, LDS_L_size is the size of the
   // length field.
@@ -69,28 +93,11 @@ int finalize_packet(struct Packet *packet)
   else
     LDS_L_size = 3;
 
-  LDS_KL_size = LDS_K_size + LDS_L_size;
 
-  // Create memory of the length of the whole packet, packet->content will be
-  // appended to this buffer.
-  uint8_t *LDS_KL = malloc((new_size + LDS_KL_size) * sizeof(uint8_t));
-  memcpy(LDS_KL, LDS_UNIVERSAL_KEY, 16);
+  uint8_t *LDS_KL = create_final_packet(LDS_L_size, new_size);
 
-  if (LDS_L_size == 1)
-    LDS_KL[LDS_K_size] = (uint8_t)new_size;
-  else if (LDS_L_size == 2)
-  {
-    LDS_KL[LDS_K_size] = (1 << 7) + 1;
-    LDS_KL[LDS_K_size + 1] = (uint8_t)new_size;
-  }
-  else
-  {
-    LDS_KL[LDS_K_size] = (1 << 7) + 2;
-    LDS_KL[LDS_K_size + 1] = (uint8_t)new_size >> 8;
-    LDS_KL[LDS_K_size + 2] = (uint8_t)new_size;
-  }
-
-  // Copy packet content after LDS KL memory
+  // Copy packet content into final packet (after Universal Key and size)
+  int LDS_KL_size = LDS_K_size + LDS_L_size;
   if (!memcpy(LDS_KL + LDS_KL_size, packet->content, packet->size))
     return 1;
 
@@ -112,31 +119,86 @@ int finalize_packet(struct Packet *packet)
   return 0;
 }
 
-struct Packet *add_klv(struct Packet *packet, const struct Field field,
-                       struct GenericValue value)
+
+char *encode_value(const struct Field field, struct GenericValue *value)
 {
   union Offset {
     float foffset;
     double doffset;
   } offset;
 
-  union Res {
-    uint16_t u16res;
-    uint32_t u32res;
-    int16_t s16res;
-    int32_t s32res;
-  } res;
+  // Conversion if needed
+  if (field.value_format != field.encoded_format)
+  {
+    switch (field.encoded_format)
+    {
+    case UINT16:
+      offset.foffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
+      value->uint16_value = unsigned_dec_to_int16(value->float_value,
+                                                  fabs(field.range.min.float_value) +
+                                                  fabs(field.range.max.float_value),
+                                                  offset.foffset);
+      return (char*)&value->uint16_value;
+    case UINT32:
+      offset.doffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
+      value->uint32_value = unsigned_dec_to_int32(value->double_value,
+                                                  fabs(field.range.min.double_value) +
+                                                  fabs(field.range.max.double_value),
+                                                  offset.doffset);
+      return (char*)&value->uint32_value;
+    case INT16:
+      value->int16_value = signed_dec_to_int16(value->float_value,
+                                               fabs(field.range.min.float_value) +
+                                               fabs(field.range.max.float_value));
+      return (char*)&value->int16_value;
 
-  int invert = 1;
+    case INT32:
+       value->int32_value = signed_dec_to_int16(value->double_value,
+                                                fabs(field.range.min.double_value) +
+                                                fabs(field.range.max.double_value));
+       return (char*)&value->int32_value;
+    default:
+      // TODO implement missing conversions
+      return NULL;
+    }
+  }
+  else
+  {
+    switch (value->type)
+    {
+    case UINT8:
+      return (char*)&value->uint8_value;
+    case UINT16:
+      return (char*)&value->uint16_value;
+    case UINT32:
+      return (char*)&value->uint32_value;
+    case UINT64:
+      return (char*)&value->uint64_value;
+    case INT8:
+      return (char*)&value->int8_value;
+    case INT16:
+      return (char*)&value->int16_value;
+    case INT32:
+      return (char*)&value->int32_value;
+    case INT64:
+      return (char*)&value->int64_value;
+    case CHAR_P:
+      return value->charp_value;
+    default :
+      return NULL;
+    }
+  }
+}
 
+
+
+struct Packet *add_klv(struct Packet *packet, const struct Field field,
+                       struct GenericValue value)
+{
   if (field.value_format != value.type)
     return NULL;
 
-  // The tag field length follow BER-OID encoding to encode the length
-  // of the KLV. Since in MISB0601 max tag value is 93, and is under
-  // 2**7 - 1 = 127, we know that the length will be encoded in 1 byte.
-  // Value length is assumed to be coded in 1 byte.
-
+  // Increase allocated size if necessary
   if (packet->available_size <= packet->size + 2 + field.len)
   {
     packet->content = realloc(packet->content, packet->available_size * 2);
@@ -146,90 +208,16 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
     packet->available_size = packet->available_size * 2;
   }
 
-  char *bytes_value = 0;
-  // Conversion if needed
-  if (field.value_format != field.encoded_format)
-  {
-
-    switch (field.encoded_format)
-    {
-    case UINT16:
-      offset.foffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
-      res.u16res = unsigned_dec_to_int16(value.float_value,
-                                     fabs(field.range.min.float_value) +
-                                     fabs(field.range.max.float_value),
-                                     offset.foffset);
-      bytes_value = (char *)&res.u16res;
-      break;
-    case UINT32:
-      offset.doffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
-      res.u32res = unsigned_dec_to_int32(value.double_value,
-                                                   fabs(field.range.min.double_value) +
-                                                   fabs(field.range.max.double_value),
-                                                   offset.doffset);
-      bytes_value = (char *)&res.u32res;
-      break;
-    case INT16:
-      res.s16res = signed_dec_to_int16(value.float_value,
-                                       fabs(field.range.min.float_value) +
-                                       fabs(field.range.max.float_value));
-      bytes_value = (char *)&res.s16res;
-      break;
-    case INT32:
-      res.s32res = signed_dec_to_int16(value.double_value,
-                                       fabs(field.range.min.double_value) +
-                                       fabs(field.range.max.double_value));
-      bytes_value = (char *)&res.s32res;
-      break;
-    default:
-      // TODO implement missing conversions
-      return NULL;
-    }
-  }
-  else
-  {
-    switch (value.type)
-    {
-    case UINT8:
-      bytes_value = (char *)&value.uint8_value;
-      break;
-    case UINT16:
-      bytes_value = (char *)&value.uint16_value;
-      break;
-    case UINT32:
-      bytes_value = (char *)&value.uint32_value;
-      break;
-    case UINT64:
-      bytes_value = (char *)&value.uint64_value;
-      break;
-    case INT8:
-      bytes_value = (char *)&value.int8_value;
-      break;
-    case INT16:
-      bytes_value = (char *)&value.int16_value;
-      break;
-    case INT32:
-      bytes_value = (char *)&value.int32_value;
-      break;
-    case INT64:
-      bytes_value = (char *)&value.int64_value;
-      break;
-    case CHAR_P:
-      bytes_value = value.charp_value;
-      invert = 0;
-      break;
-    default :
-      return NULL;
-      break;
-    }
-  }
+  char *bytes_value = encode_value(field, &value);
+  if (!bytes_value)
+    return NULL;
 
   packet->content[packet->size++] = field.key;
   packet->content[packet->size++] = field.len;
-  // We insert backward because of endianess
   for (int i = 0; i < field.len; i++)
   {
-    if (invert)
+    // Because of endianess we insert backward, except when dealing with char*
+    if (value.type != CHAR_P)
       packet->content[packet->size++] = bytes_value[field.len - i - 1];
     else
     {

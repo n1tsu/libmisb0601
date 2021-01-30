@@ -18,7 +18,7 @@
 struct KLV {
   enum Tags tag;
   size_t size;
-  unsigned char *data;
+  struct GenericValue value;
 };
 
 /**

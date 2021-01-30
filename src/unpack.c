@@ -1,7 +1,10 @@
 #include "unpack.h"
+#include "utils.h"
 
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
+
 
 #define checksumByte(i) data[i] << (8 * ((i + 1) % 2))
 
@@ -51,6 +54,93 @@ size_t packet_length(unsigned short *checksum, size_t *i, unsigned char *data)
   }
 }
 
+struct GenericValue decode_value(const struct Field field, unsigned char *value)
+{
+  union Offset {
+    float foffset;
+    double doffset;
+  } offset;
+
+  struct GenericValue result;
+  result.type = field.value_format;
+
+  // Conversion if needed
+  if (field.value_format != field.encoded_format)
+  {
+    switch (field.encoded_format)
+    {
+    case UINT16:
+      offset.foffset = (field.range.min.float_value < 0) ? -field.range.min.float_value : 0;
+      result.float_value = int16_to_unsigned_dec((unsigned short)*value,
+                                                  fabs(field.range.min.float_value) +
+                                                  fabs(field.range.max.float_value),
+                                                  offset.foffset);
+      return result;
+
+    case UINT32:
+      offset.doffset = (field.range.min.double_value < 0) ? -field.range.min.double_value : 0;
+      result.double_value = int32_to_unsigned_dec((int)*value,
+                                                  fabs(field.range.min.double_value) +
+                                                  fabs(field.range.max.double_value),
+                                                  offset.doffset);
+      return result;
+
+    case INT16:
+      result.float_value = int16_to_signed_dec((unsigned)*value,
+                                                fabs(field.range.min.float_value) +
+                                                fabs(field.range.max.float_value));
+      return result;
+
+    case INT32:
+      result.double_value = int32_to_signed_dec((int)*value,
+                                                fabs(field.range.min.double_value) +
+                                                fabs(field.range.max.double_value));
+      return result;
+
+    default:
+      // TODO implement missing conversions
+      return result;
+    }
+  }
+  else
+  {
+    switch (field.value_format)
+    {
+    case UINT8:
+      result.uint8_value = (uint8_t)*value;
+      return result;
+    case UINT16:
+      result.uint8_value = (uint16_t)*value;
+      return result;
+    case UINT32:
+      result.uint8_value = (uint32_t)*value;
+      return result;
+    case UINT64:
+      result.uint8_value = (uint64_t)*value;
+      return result;
+    case INT8:
+      result.uint8_value = (int8_t)*value;
+      return result;
+    case INT16:
+      result.uint8_value = (int16_t)*value;
+      return result;
+    case INT32:
+      result.uint8_value = (int32_t)*value;
+      return result;
+    case INT64:
+      result.int64_value = (int64_t)*value;
+      return result;
+    case CHAR_P:
+      result.charp_value = (char *)value;
+      return result;
+    default :
+      // TODO Handle properly error
+      return result;
+    }
+  }
+}
+
+
 /**
  *  - Check Universal Key.
  *  - Get length.
@@ -90,7 +180,8 @@ int unpack_misb(unsigned char *data, size_t size, struct KLVMap *klvmap)
 
     klv->tag = klv_tag;
     klv->size = klv_size;
-    klv->data = data + i;
+    struct GenericValue value = decode_value(FieldMap[klv_tag], data + i);
+    klv->value = value;
 
     // Calculate checksum for the content of the KLV.
     for (size_t y = 0; y < klv_size; y++)
