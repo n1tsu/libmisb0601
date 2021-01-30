@@ -9,17 +9,20 @@ Usage :
 ```c
 #include "packet.h"
 
-// Initialize an UDS packet
-// Unix Timestamp and UAS_LDS version KLVs are added automatically
+// Initialize packet (add mandatories KLVs)
 struct Packet *packet = initialize_packet();
 
-// Add mission name KLV to packet
+// Instantiate values with union
 char *name = "MISSION01";
-struct GenericValue value = {CHAR_P, .charp_value = name};
-packet = add_klv(packet, F_MISSION_ID, value);
+struct GenericValue mission_value = {CHAR_P, .charp_value = name};
+float slant_range = 823.20;
+struct GenericValue range_value = {FLOAT, .float_value = slant_range};
 
-// Finalize packet to be ready to being sent
-// Checksum KLV is calculated and added
+// Add KLVs into packet
+packet = add_klv(packet, FieldMap[MISSION], mission_value);
+packet = add_klv(packet, FieldMap[SLANT_RANGE], range_value);
+
+// Finalize packet by adding checksum and total length
 finalize_packet(packet);
 
 // We can then access data with `packet->content` and `packet->size`
@@ -35,22 +38,21 @@ Usage :
 // Initialize the map that will hold the KLVs
 struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
 
-// Set all pointers to NULL
-for (int i = 0; i < 94; i++)
-    klvmap->KLVs[i] = NULL;
-
 // Trying to unpack the misb, check header to see error code
-int res = unpack_misb(data, size, klvmap);
-if (res)
-    fprintf(stderr, "Error unpacking the packet : %d\n", res);
+if (unpack_misb(data, size, klvmap))
+  fprintf(stderr, "Error unpacking the packet : %d\n", res);
 
 // Iterating over the map to retrieve KLVs
 for (int i = 0; i < 94; i++)
 {
-    if (klvmap->KLVs[i])
-        printf("Tag %d - Size %ld\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
+  if (klvmap->KLVs[i])
+    printf("Tag %d - Size %ld\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
 }
 
+// Or access wanted klv directly
+struct KLV timestamp_klv = klvmap[UNIX_TIME_STAMP];
+
+// Don't forget to free klvs when you are done
 free(klvmap);
 ```
 
