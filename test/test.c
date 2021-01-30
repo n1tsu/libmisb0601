@@ -247,12 +247,6 @@ Test(Unpack, unpack_slant)
     struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
     int result = unpack_misb(packet->content, packet->size, klvmap);
 
-    for (int i = 0; i < 94; i++)
-    {
-      if (klvmap->KLVs[i])
-        printf("Tag %d - Size %ld\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
-    }
-
     cr_assert_eq(result, 0, "got %d and expected %d",
                  result, 0);
     cr_assert_eq(klvmap->KLVs[SLANT_RANGE]->tag, SLANT_RANGE, "got %d and expected %d",
