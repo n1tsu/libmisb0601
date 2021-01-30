@@ -228,6 +228,39 @@ Test(Unpack, unpack_mission)
                  klvmap->KLVs[MISSION_ID]->tag, MISSION_ID);
     cr_assert_str_eq(klvmap->KLVs[MISSION_ID]->value.charp_value, "MISSION01", "got %s and expected %s",
                      klvmap->KLVs[MISSION_ID]->value.charp_value, "MISSION01");
+    cr_assert_eq(klvmap->KLVs[MISSION_ID]->size, 9, "got %s and expected %s",
+                 klvmap->KLVs[MISSION_ID]->size, 9);
+
+    free_packet(packet);
+    free(klvmap);
+}
+
+Test(Unpack, unpack_slant)
+{
+    struct Packet *packet = initialize_packet();
+
+    float slant_range = 823.20;
+    struct GenericValue value = {FLOAT, .float_value = slant_range};
+    packet = add_klv(packet, FieldMap[SLANT_RANGE], value);
+    finalize_packet(packet);
+
+    struct KLVMap *klvmap = malloc(sizeof(struct KLVMap));
+    int result = unpack_misb(packet->content, packet->size, klvmap);
+
+    for (int i = 0; i < 94; i++)
+    {
+      if (klvmap->KLVs[i])
+        printf("Tag %d - Size %ld\n", klvmap->KLVs[i]->tag, klvmap->KLVs[i]->size);
+    }
+
+    cr_assert_eq(result, 0, "got %d and expected %d",
+                 result, 0);
+    cr_assert_eq(klvmap->KLVs[SLANT_RANGE]->tag, SLANT_RANGE, "got %d and expected %d",
+                 klvmap->KLVs[SLANT_RANGE]->tag, SLANT_RANGE);
+    cr_assert_float_eq(klvmap->KLVs[SLANT_RANGE]->value.float_value, 0.1, 823.20, "got %f and expected %f",
+                       klvmap->KLVs[SLANT_RANGE]->value.float_value, 0.1, 823.20);
+    cr_assert_eq(klvmap->KLVs[SLANT_RANGE]->size, 4, "got %s and expected %s",
+                 klvmap->KLVs[SLANT_RANGE]->size, 4);
 
     free_packet(packet);
     free(klvmap);

@@ -216,6 +216,7 @@ struct Packet *add_klv(struct Packet *packet, const struct Field field,
   if (!bytes_value)
     return NULL;
 
+  printf("%d\n", field.key);
   packet->content[packet->size++] = field.key;
   packet->content[packet->size++] = field_len;
   for (int i = 0; i < field_len; i++)

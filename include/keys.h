@@ -346,6 +346,16 @@ static const struct Field FieldMap[94] = {
     },
   },
   {
+    .key = SENSOR_RELATIVE_ELEVATION_ANGLE,
+    .value_format = DOUBLE,
+    .encoded_format = INT32,
+    .len = 4,
+    .range = {
+      {DOUBLE, .double_value = -180},
+      {DOUBLE, .double_value = 180}
+    },
+  },
+  {
     .key = SENSOR_RELATIVE_ROLL_ANGLE,
     .value_format = DOUBLE,
     .encoded_format = UINT32,
